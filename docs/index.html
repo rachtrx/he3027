@@ -36,6 +36,7 @@
     .controls {display:block} #selectors {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0} button {padding:8px;cursor:pointer;margin:6px 0} .cards {display:none} .panel:has(#cards) {display:none} td small {display:block;color:var(--muted)} th {white-space:normal} td {max-width:320px;white-space:normal} summary {cursor:pointer;font-weight:600;margin-bottom:12px}
     .note { font-size:13px; color:var(--muted); }
     .error { color:#a33b22; }
+    #comparison {max-height:75vh;overflow:auto;scroll-behavior:smooth} #comparison thead th {position:sticky;top:0;z-index:2;text-transform:none;letter-spacing:normal;vertical-align:top} #comparison th:first-child {position:sticky;left:0;background:#f3f6fa;min-width:160px;z-index:1} #comparison thead th:first-child {z-index:3} .column-control {display:flex;align-items:center;gap:6px;min-width:260px} .column-control select {width:100%;min-width:0;max-width:360px;margin:0;font-size:13px;text-overflow:ellipsis} .column-remove {flex:none;border:0!important;background:transparent;color:var(--muted);font-size:20px!important} #comparison .add-column {min-width:52px;width:52px;padding:8px;background:#f3f6fa} .add-column button {border-radius:50%;width:36px;height:36px;padding:0;font-size:24px;background:white;color:var(--blue)} @media(prefers-reduced-motion:reduce){#comparison{scroll-behavior:auto}}
     [hidden] {display:none!important} .gallery,.file-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px} article {padding:12px;border:1px solid var(--line);border-radius:8px;background:white} article small {display:block;color:var(--muted)} .gallery img,#pinned img {width:100%;height:210px;object-fit:contain} .image-button {width:100%;border:0;background:white} #pinned {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px} #pinned img {height:auto} .filters {display:flex;gap:12px;flex-wrap:wrap;align-items:end} input,button {font:inherit;padding:9px;border:1px solid #bac5d3;border-radius:6px} button:disabled {opacity:.45;cursor:default} nav {display:flex;gap:20px;margin:20px 0} a {color:var(--blue)} dialog {max-width:96vw;max-height:95vh;border:0;border-radius:12px} dialog img {max-width:90vw;max-height:78vh;object-fit:contain} :focus-visible {outline:3px solid var(--blue);outline-offset:2px}
     @media (max-width:760px) { .controls,.cards { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); } }
   </style>
@@ -51,19 +52,14 @@
   <section id="compare" class="panel">
     <h2>Compare up to five regressions</h2>
     <div class="controls">
-      <label for="family">Analysis / result table</label><select id="family"></select>
-      <div id="model-control"><label for="model">Same model</label><select id="model"></select></div>
-      <div id="selectors"></div><button id="add" disabled>+ Add comparison</button>
+      <label for="advanced"><input id="advanced" type="checkbox"> Advanced regressions (include IV)</label>
+      <p class="note">Choose a regression in each column header. Use + to add a column (up to five).</p>
     </div>
-    <p id="context" class="note"></p>
-  </section>
-
-
-
-  <section class="panel">
     <div id="comparison" class="table-wrap"></div>
+    <details><summary>How to interpret comparisons</summary><p id="context" class="note"></p></details>
     <p class="note">A dash means unavailable. Results describe associations unless a valid causal design is established. Full coefficient tables are available under All tables.</p>
   </section>
+  <section id="iv-diagnostics" class="panel" hidden><details><summary>IV diagnostics and first-stage / reduced-form results</summary><p class="note">These diagnose the IV design and are separate from the housing-price coefficient comparison. A strong first stage does not establish instrument validity.</p><div id="diagnostic-table" class="table-wrap"></div></details></section>
 
   <section class="panel">
     <h2>Explore outputs</h2><div class="filters"><label>Notebook<select id="group"></select></label><label>Search filenames<input id="search" type="search" placeholder="e.g. bootstrap, coverage"></label></div><p id="inventory" role="status"></p>

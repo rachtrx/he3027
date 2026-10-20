@@ -3,6 +3,7 @@ import csv
 import hashlib
 import json
 import math
+import re
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -12,7 +13,10 @@ DEST = ROOT / 'docs' / 'generated'
 
 
 def title(value):
-    return value.replace('_', ' ').replace('-', ' ').strip().capitalize()
+    text = re.sub(r'^\d+[_ -]*', '', value).replace('_', ' ').replace('-', ' ').strip().capitalize()
+    for acronym in ['iv', 'mps', 'ols', 'twfe', 'lsoa', 'msoa', 'csv']:
+        text = re.sub(r'\b'+acronym+r'\b', acronym.upper(), text, flags=re.I)
+    return text
 
 
 def value(text):

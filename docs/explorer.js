@@ -1,32 +1,60 @@
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const name=x=>String(x).replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
+const groupName=id=>catalog.groups.find(g=>g.id===id)?.label||name(id.replace(/^\d+[_ -]*/, '').replace(/_outputs$/, ''));
 const fmt=x=>x==null?'—':typeof x==='number'?Number.isInteger(x)?x.toLocaleString():Math.abs(x)>0&&Math.abs(x)<.0001?x.toExponential(3):x.toFixed(4):esc(x);
 const cell=(v,key)=>key==='beta'?`<span class="${v>0?'positive':v<0?'negative':''}">${fmt(v)}</span>`:fmt(v);
 const url=p=>p.split('/').map(encodeURIComponent).join('/');
 const table=(heads,rows)=>`<table><thead><tr>${heads.map(h=>`<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>i?`<td>${v}</td>`:`<th scope="row">${v}</th>`).join('')}</tr>`).join('')}</tbody></table>`;
-let catalog, family, selected=[], pinned=[], loaded=null, page=0, sortKey=null, ascending=true, request=0;
-const rowLabel=r=>['source','model','exposure_label','exposure','timing','specification','method','crime','quantile','k'].filter(k=>r[k]!=null).map(k=>['quantile','k'].includes(k)?`${name(k)} ${r[k]}`:r[k]).join(' · ');
-const options=()=>family.rows.filter(r=>family.id!=='main'||r.model===$('model').value);
+let catalog, pool=[], diagnostics=[], selected=[], pinned=[], loaded=null, page=0, sortKey=null, ascending=true, request=0;
+function rowLabel(r){
+ const crime={allcrime:'All crime',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'Property-only benchmark'}[r.crime]||r.crime||(r._iv?'Residential burglary':'');
+ const data=r.data_source||(r._iv||String(r.crime).startsWith('mps_')||/\bmps\b/i.test(r.source||'')?'MPS':r.model?'Original':'Source unspecified');
+ const timing=r.exposure_label||r.exposure||r.timing;
+ const time={lagyear:'prevyear','previous-year':'prevyear','current-year':'annual'}[timing]||timing||'Timing unspecified';
+ const estimator=r.method==='2SLS'?'IV':r.method||r.estimator||(r.quantile!=null?'Quantile':r._family==='Spatial regressions'?'Spatial':'OLS');
+ const model=r.model||r.specification||(r.quantile!=null?`Q${Number((r.quantile*100).toFixed(2))}`:'Model unspecified');
+ return [model,estimator,data,time,crime,r.quantile!=null&&r.specification?`Q${r.quantile*100}`:null,r.k!=null?`${r.k} neighbours`:null].filter(Boolean).join(' · ');
+}
+const options=()=>pool.filter(r=>$('advanced').checked||!r._iv);
+function prepareComparisons(){
+ const unique=new Map();diagnostics=[];
+ for(const family of catalog.families){
+  const iv=family.columns.includes('first_stage_wald_F')||family.rows.some(r=>r.method==='2SLS');
+  for(const row of family.rows){
+   if(iv&&!['2SLS','OLS','TWFE'].includes(row.method)){diagnostics.push({...row,analysis:family.label});continue;}
+   const identity=JSON.stringify([family.id==='main'?'main':family.id.split('/')[0],...['model','panel','exposure','exposure_label','specification','method','crime','quantile','k','N','beta'].map(k=>row[k]??null)]);
+   const candidate={...row,id:identity,_iv:iv,_family:family.id==='main'?'Main regressions':iv?'IV and matched OLS/TWFE':row.quantile!=null?'Quantile regressions':'Spatial regressions',analysis:family.label};
+   const previous=unique.get(identity);
+   if(!previous||Object.keys(row).length>Object.keys(previous).length-4)unique.set(identity,candidate);
+  }
+ }
+ pool=[...unique.values()];
+ const defaults=pool.filter(r=>r.model==='M2');selected=defaults.slice(0,2).map(r=>r.id);
+ renderCompare();
+ const fields=['analysis','exposure','specification','method','beta','se','ci_low','ci_high','first_stage_wald_F','partial_R2','AR_95_set'];
+ $('diagnostic-table').innerHTML=diagnostics.length?table(fields.map(name),diagnostics.map(r=>fields.map(k=>cell(r[k],k)))):'No IV diagnostics available.';
+}
 function renderCompare(){
- const rows=options(); if(!rows.length){$('comparison').textContent='No matching regressions.';return;}
+ const rows=options();$('iv-diagnostics').hidden=!$('advanced').checked;
+ if(!rows.length){$('comparison').textContent='No matching regressions.';return;}
  selected=selected.filter(id=>rows.some(r=>r.id===id));
  while(selected.length<Math.min(2,rows.length))selected.push(rows.find(r=>!selected.includes(r.id)).id);
- $('selectors').innerHTML=selected.map((id,i)=>`<div><label for="r${i}">Comparison ${i+1}</label><select id="r${i}" data-select="${i}">${rows.map(r=>`<option value="${esc(r.id)}" ${r.id===id?'selected':''}>${esc(rowLabel(r))}</option>`).join('')}</select><button data-remove="${i}" ${selected.length<=2?'disabled':''}>Remove ${i+1}</button></div>`).join('');
- $('add').disabled=selected.length>=5||selected.length>=rows.length;
+ const headers=selected.map((id,i)=>`<th scope="col"><div class="column-control"><select id="r${i}" aria-label="Regression for column ${i+1}" title="${esc(rowLabel(rows.find(r=>r.id===id)))}" data-select="${i}">${[...new Set(rows.map(r=>r._family))].map(group=>`<optgroup label="${esc(group)}">${rows.filter(r=>r._family===group).map(r=>`<option value="${esc(r.id)}" ${r.id===id?'selected':''}>${esc(rowLabel(r))}</option>`).join('')}</optgroup>`).join('')}</select><button class="column-remove" data-remove="${i}" aria-label="Remove comparison ${i+1}" title="Remove column" ${selected.length<=2?'disabled':''}>×</button></div></th>`).join('');
+ const atLimit=selected.length>=5||selected.length>=rows.length;
  const chosen=selected.map(id=>rows.find(r=>r.id===id));
- const preferred=['beta','se','bootstrap_se','ci_low','ci_high','p','N','clusters','first_stage_wald_F','partial_R2','AR_95_set','bootstrap_success','fixed_effects','r2','r2_type'];
- const fields=[...new Set([...preferred,...family.columns])].filter(k=>!['id','source','output','model'].includes(k)&&chosen.some(r=>r[k]!=null));
- $('comparison').innerHTML=table(['Statistic',...chosen.map((r,i)=>`${i+1}. ${rowLabel(r)}`)],fields.map(k=>[esc(name(k)),...chosen.map(r=>cell(r[k],k))]));
- const cols=new Set(family.columns);
- $('context').textContent=cols.has('method')?'IV: first stage predicts residential burglary; reduced form predicts prices using the instrument. Instrument strength does not establish validity.':cols.has('quantile')?'Quantiles describe the conditional price distribution. Review sample size and successful bootstrap draws before interpreting intervals.':cols.has('k')?'Spatial models use area-year observations. k is the number of neighbours. Check the specification before comparing coefficients.':'Compare samples, timing and fixed effects alongside coefficients. M1 is a property-only benchmark.';
+ const preferred=['model','method','data_source','crime','exposure_label','exposure','quantile','specification','k','beta','se','bootstrap_se','ci_low','ci_high','p','N','clusters','first_stage_wald_F','partial_R2','AR_95_set','bootstrap_success','fixed_effects','r2','r2_type'];
+ const fields=[...new Set([...preferred,...chosen.flatMap(Object.keys)])].filter(k=>!k.startsWith('_')&&!['id','source','output','analysis','panel'].includes(k)&&chosen.some(r=>r[k]!=null));
+ const scroll=$('comparison').scrollLeft;
+ $('comparison').innerHTML=`<table><thead><tr><th scope="col">Statistic</th>${headers}<th class="add-column" scope="col"><button data-add="true" aria-label="Add comparison column" title="${atLimit?'Comparison limit reached':'Add comparison'}" ${atLimit?'disabled':''}>+</button></th></tr></thead><tbody>${fields.map(k=>`<tr><th scope="row">${esc(name(k))}</th>${chosen.map(r=>`<td>${cell(r[k],k)}</td>`).join('')}<td class="add-column"></td></tr>`).join('')}</tbody></table>`;
+ $('comparison').scrollLeft=scroll;
+ $('context').textContent='Cross-analysis comparisons are descriptive: IV targets residential burglary, quantiles target conditional price percentiles, and spatial models may use area-year observations. Check the crime definition, sample, timing and fixed effects in each column. M1 has no crime coefficient.';
 }
-function changeFamily(){family=catalog.families.find(f=>f.id===$('family').value);if(!family)return;selected=[];$('model-control').hidden=family.id!=='main';const models=[...new Set(family.rows.map(r=>r.model).filter(Boolean))].sort();$('model').innerHTML=models.map(m=>`<option>${esc(m)}</option>`).join('');if(models.includes('M2'))$('model').value='M2';renderCompare();}
 function matches(item){return(!$('group').value||item.group===$('group').value)&&(`${item.title} ${item.group}`.toLowerCase().includes($('search').value.toLowerCase()));}
 function browse(){
  const items=catalog.files.filter(matches), images=items.filter(x=>x.kind==='figure'), tables=items.filter(x=>x.kind==='table');
- $('gallery').innerHTML=images.map(f=>`<article><button class="image-button" data-open="${esc(f.id)}"><img loading="lazy" src="${url(f.url)}" alt="${esc(f.title)}"></button><strong>${esc(f.title)}</strong><small>${esc(name(f.group))}</small><button data-pin="${esc(f.id)}">${pinned.includes(f.id)?'Unpin':'Compare figure'}</button> <a href="${url(f.url)}" download>Download</a></article>`).join('')||'<p>No matching figures.</p>';
- $('files').innerHTML=tables.map(f=>`<article><button data-table="${esc(f.id)}">${esc(f.title)}</button><small>${esc(name(f.group))} · ${f.rows.toLocaleString()} rows</small><a href="${url(f.url)}" download>Download CSV</a></article>`).join('')||'<p>No matching tables.</p>';
+ $('gallery').innerHTML=images.map(f=>`<article><button class="image-button" data-open="${esc(f.id)}"><img loading="lazy" src="${url(f.url)}" alt="${esc(f.title)}"></button><strong>${esc(f.title)}</strong><small>${esc(groupName(f.group))}</small><button data-pin="${esc(f.id)}">${pinned.includes(f.id)?'Unpin':'Compare figure'}</button> <a href="${url(f.url)}" download>Download</a></article>`).join('')||'<p>No matching figures.</p>';
+ $('files').innerHTML=tables.map(f=>`<article><button data-table="${esc(f.id)}">${esc(f.title)}</button><small>${esc(groupName(f.group))} · ${f.rows.toLocaleString()} rows</small><a href="${url(f.url)}" download>Download CSV</a></article>`).join('')||'<p>No matching tables.</p>';
  $('inventory').textContent=`${images.length} figures · ${tables.length} tables matching filters`;
  $('pinned').innerHTML=pinned.map(id=>{const f=catalog.files.find(f=>f.id===id);return `<article><button data-open="${esc(id)}" class="image-button"><img src="${url(f.url)}" alt="${esc(f.title)}"></button><p>${esc(f.title)}</p><button data-pin="${esc(id)}">Remove</button></article>`;}).join('');
  $('pin-status').textContent=pinned.length?`${pinned.length}/2 figures selected`:'Select up to two figures for side-by-side viewing.';
@@ -42,15 +70,15 @@ function renderTable(){
 }
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
- if(b.dataset.remove!=null&&selected.length>2){selected.splice(+b.dataset.remove,1);renderCompare();}
+ if(b.dataset.remove!=null&&selected.length>2){const index=+b.dataset.remove;selected.splice(index,1);renderCompare();document.getElementById(`r${Math.min(index,selected.length-1)}`)?.focus();}
+ if(b.dataset.add&&selected.length<5){const next=options().find(r=>!selected.includes(r.id));if(next){selected.push(next.id);renderCompare();document.getElementById(`r${selected.length-1}`)?.focus();}}
  if(b.dataset.open){const f=catalog.files.find(f=>f.id===b.dataset.open);$('large-image').src=url(f.url);$('large-image').alt=f.title;$('image-title').textContent=f.title;$('image-dialog').showModal();}
  if(b.dataset.pin){const id=b.dataset.pin;if(pinned.includes(id))pinned=pinned.filter(x=>x!==id);else if(pinned.length<2)pinned.push(id);else{$('pin-status').textContent='Remove a selected figure before adding another.';return;}browse();}
  if(b.dataset.table){const f=catalog.files.find(f=>f.id===b.dataset.table),token=++request;$('table-title').textContent=f.title;$('preview-panel').hidden=false;$('preview').textContent='Loading…';try{const r=await fetch(url(f.json));if(!r.ok)throw Error(`HTTP ${r.status}`);const data=await r.json();if(token!==request)return;loaded=data;page=0;sortKey=null;$('row-search').value='';$('sort').innerHTML='<option value="">Original order</option>'+loaded.columns.map(c=>`<option value="${esc(c)}">${esc(name(c))}</option>`).join('');renderTable();}catch(err){if(token===request){loaded=null;$('preview').textContent=`Could not load table: ${err.message}`;}}}
 });
-$('selectors').addEventListener('change',e=>{if(e.target.dataset.select!=null){selected[+e.target.dataset.select]=e.target.value;renderCompare();}});
-$('add').onclick=()=>{if(selected.length<5){const next=options().find(r=>!selected.includes(r.id));if(next)selected.push(next.id);renderCompare();}};
-$('family').onchange=changeFamily;$('model').onchange=()=>{selected=[];renderCompare();};
+$('comparison').addEventListener('change',e=>{if(e.target.dataset.select!=null){const index=+e.target.dataset.select;selected[index]=e.target.value;renderCompare();document.getElementById(`r${index}`)?.focus({preventScroll:true});}});
+$('advanced').onchange=renderCompare;
 $('group').onchange=browse;$('search').oninput=browse;
 $('close-image').onclick=()=>$('image-dialog').close();
 $('row-search').oninput=()=>{page=0;renderTable();};$('sort').onchange=()=>{sortKey=$('sort').value;renderTable();};$('direction').onclick=()=>{ascending=!ascending;$('direction').textContent=ascending?'Ascending':'Descending';renderTable();};$('prev').onclick=()=>{page--;renderTable();};$('next').onclick=()=>{page++;renderTable();};
-fetch('generated/catalog.json').then(r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();}).then(data=>{catalog=data;$('family').innerHTML=data.families.map(f=>`<option value="${esc(f.id)}">${esc(f.label)}</option>`).join('');$('group').innerHTML='<option value="">All notebooks</option>'+data.groups.map(g=>`<option value="${esc(g.id)}">${esc(g.label)}</option>`).join('');if(data.families.length)changeFamily();else $('comparison').textContent='No regression summaries found.';browse();$('status').textContent=`Built ${new Date(data.built_at).toLocaleString()} · ${data.files.length} outputs. Build time is not notebook execution time.`;}).catch(e=>{$('status').textContent=`Could not load results: ${e.message}`;});
+fetch('generated/catalog.json').then(r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();}).then(data=>{catalog=data;$('group').innerHTML='<option value="">All notebooks</option>'+data.groups.map(g=>`<option value="${esc(g.id)}">${esc(g.label)}</option>`).join('');prepareComparisons();browse();$('status').textContent=`Built ${new Date(data.built_at).toLocaleString()} · ${data.files.length} outputs. Build time is not notebook execution time.`;}).catch(e=>{$('status').textContent=`Could not load results: ${e.message}`;});

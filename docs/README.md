@@ -1,5 +1,7 @@
 # Regression comparison dashboard
 
+Each of up to five comparison columns selects independently across model numbers and analysis types. The **Advanced regressions (include IV)** checkbox is off by default: main, quantile and spatial results are available without it. Enabling it also exposes 2SLS and the IV notebook's matched OLS/TWFE benchmarks. First-stage, reduced-form and IV diagnostic summaries are in a separate expandable section, not the regression selector. Turning the checkbox off removes IV-family selections while retaining the other columns.
+
 ## Automatic discovery
 
 Run `python build_dashboard_data.py` locally, or push committed outputs to main and let GitHub Actions build it. The builder scans every `data/*outputs/` folder recursively for CSV and PNG/JPEG/WebP/GIF files. No filename registration is required. New folders, tables and figures appear automatically. Other formats, including compressed inputs, are not published.
