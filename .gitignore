@@ -1,4 +1,6 @@
 /.venv
+/docs/generated/
+__pycache__/
 *.zip
 /codex
 /data/*

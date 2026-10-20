@@ -32,9 +32,11 @@
     th:first-child, td:first-child { text-align:left; }
     thead th { background:#f3f6fa; color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
     tbody tr:last-child td { border-bottom:0; }
-    .positive { color:#a33b22; } .negative { color:#136d4c; } .muted { color:var(--muted); }
+    .positive { color:#136d4c; } .negative { color:#a33b22; } .muted { color:var(--muted); }
+    .controls {display:block} #selectors {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0} button {padding:8px;cursor:pointer;margin:6px 0} .cards {display:none} .panel:has(#cards) {display:none} td small {display:block;color:var(--muted)} th {white-space:normal} td {max-width:320px;white-space:normal} summary {cursor:pointer;font-weight:600;margin-bottom:12px}
     .note { font-size:13px; color:var(--muted); }
     .error { color:#a33b22; }
+    [hidden] {display:none!important} .gallery,.file-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px} article {padding:12px;border:1px solid var(--line);border-radius:8px;background:white} article small {display:block;color:var(--muted)} .gallery img,#pinned img {width:100%;height:210px;object-fit:contain} .image-button {width:100%;border:0;background:white} #pinned {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px} #pinned img {height:auto} .filters {display:flex;gap:12px;flex-wrap:wrap;align-items:end} input,button {font:inherit;padding:9px;border:1px solid #bac5d3;border-radius:6px} button:disabled {opacity:.45;cursor:default} nav {display:flex;gap:20px;margin:20px 0} a {color:var(--blue)} dialog {max-width:96vw;max-height:95vh;border:0;border-radius:12px} dialog img {max-width:90vw;max-height:78vh;object-fit:contain} :focus-visible {outline:3px solid var(--blue);outline-offset:2px}
     @media (max-width:760px) { .controls,.cards { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); } }
   </style>
 </head>
@@ -42,98 +44,37 @@
 <main>
   <section class="intro">
     <h1>Crime and housing regression comparison</h1>
-    <p>Choose any two regressions estimated at the same model number. Compare crime coefficients, uncertainty, sample definitions, fixed effects, and the full aligned coefficient tables.</p>
+    <p>Compare results, explore figures, or browse every exported table. Green means positive; red means negative. Colours indicate direction, not whether a result is desirable.</p>
+    <nav aria-label="Results sections"><a href="#compare">Compare</a><a href="#figures">Figures</a><a href="#outputs">All tables</a></nav>
   </section>
 
-  <section class="panel">
+  <section id="compare" class="panel">
+    <h2>Compare up to five regressions</h2>
     <div class="controls">
-      <div><label for="model">Same model</label><select id="model"></select></div>
-      <div><label for="left">Regression A</label><select id="left"></select></div>
-      <div><label for="right">Regression B</label><select id="right"></select></div>
+      <label for="family">Analysis / result table</label><select id="family"></select>
+      <div id="model-control"><label for="model">Same model</label><select id="model"></select></div>
+      <div id="selectors"></div><button id="add" disabled>+ Add comparison</button>
     </div>
-    <p class="note">M1 has no crime coefficient; it is included as a property-only benchmark. Comparisons should be interpreted alongside N, controls, timing, and fixed effects.</p>
+    <p id="context" class="note"></p>
   </section>
 
-  <section class="panel">
-    <div id="cards" class="cards"></div>
-  </section>
+
 
   <section class="panel">
-    <h2>Regression-level comparison</h2>
     <div id="comparison" class="table-wrap"></div>
+    <p class="note">A dash means unavailable. Results describe associations unless a valid causal design is established. Full coefficient tables are available under All tables.</p>
   </section>
 
   <section class="panel">
-    <h2>Aligned coefficient table</h2>
-    <div id="coefficients" class="table-wrap"></div>
+    <h2>Explore outputs</h2><div class="filters"><label>Notebook<select id="group"></select></label><label>Search filenames<input id="search" type="search" placeholder="e.g. bootstrap, coverage"></label></div><p id="inventory" role="status"></p>
   </section>
+  <section id="figures"><h2>Figures</h2><p id="pin-status" role="status"></p><div id="pinned"></div><div id="gallery" class="gallery"></div></section>
+  <section id="outputs"><h2>All tables</h2><div id="files" class="file-list"></div></section>
+  <section id="preview-panel" class="panel" hidden><h2 id="table-title"></h2><div class="filters"><label>Search rows<input id="row-search" type="search"></label><label>Sort by<select id="sort"></select></label><button id="direction">Ascending</button></div><div id="preview" class="table-wrap"></div><button id="prev">Previous</button> <span id="page"></span> <button id="next">Next</button></section>
   <p id="status" class="note"></p>
 </main>
-<script>
-const fmt = (x, digits=4) => x === null || x === undefined || Number.isNaN(Number(x)) ? '—' : Number(x).toFixed(digits);
-const pct = x => x === null || x === undefined || Number.isNaN(Number(x)) ? '—' : `${(100*Number(x)).toFixed(2)}%`;
-const esc = s => String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
-const betaClass = x => x === null ? 'muted' : Number(x) < 0 ? 'negative' : Number(x) > 0 ? 'positive' : '';
-let records = [];
-const modelSelect = document.querySelector('#model');
-const leftSelect = document.querySelector('#left');
-const rightSelect = document.querySelector('#right');
+<dialog id="image-dialog"><button id="close-image">Close</button><h2 id="image-title"></h2><img id="large-image" alt=""></dialog>
+<script src="explorer.js"></script>
 
-function optionsFor(model) {
-  return records.filter(r => r.model === model);
-}
-function fillRegressionSelect(select, items) {
-  select.innerHTML = items.map(r => `<option value="${esc(r.id)}">${esc(r.label)}</option>`).join('');
-}
-function current(id) { return records.find(r => r.id === id); }
-function card(r) {
-  return `<article class="card">
-    <span class="tag">${esc(r.source)} · ${esc(r.timing)}</span>
-    <h3>${esc(r.label)}</h3>
-    <div class="stats">
-      <div class="stat"><small>Crime beta</small><strong class="${betaClass(r.beta)}">${fmt(r.beta)}</strong></div>
-      <div class="stat"><small>Clustered SE</small><strong>${fmt(r.se)}</strong></div>
-      <div class="stat"><small>95% CI</small><strong>${r.ci_low === null ? '—' : `${fmt(r.ci_low)} to ${fmt(r.ci_high)}`}</strong></div>
-      <div class="stat"><small>p-value</small><strong>${fmt(r.p, 4)}</strong></div>
-      <div class="stat"><small>Observations</small><strong>${r.N === null ? '—' : Number(r.N).toLocaleString()}</strong></div>
-      <div class="stat"><small>Clusters</small><strong>${r.clusters === null ? '—' : Number(r.clusters).toLocaleString()}</strong></div>
-    </div>
-    <p class="meta"><b>Fixed effects:</b> ${esc(r.fixed_effects || 'None')}<br><b>R²:</b> ${fmt(r.r2)} ${esc(r.r2_type || '')}</p>
-  </article>`;
-}
-function render() {
-  const a = current(leftSelect.value), b = current(rightSelect.value);
-  if (!a || !b) return;
-  document.querySelector('#cards').innerHTML = card(a) + card(b);
-  document.querySelector('#comparison').innerHTML = `<table><thead><tr><th>Statistic</th><th>${esc(a.label)}</th><th>${esc(b.label)}</th></tr></thead><tbody>
-    <tr><td>Crime coefficient</td><td class="${betaClass(a.beta)}">${fmt(a.beta)}</td><td class="${betaClass(b.beta)}">${fmt(b.beta)}</td></tr>
-    <tr><td>Clustered SE</td><td>${fmt(a.se)}</td><td>${fmt(b.se)}</td></tr>
-    <tr><td>95% confidence interval</td><td>${a.ci_low === null ? '—' : `${fmt(a.ci_low)} to ${fmt(a.ci_high)}`}</td><td>${b.ci_low === null ? '—' : `${fmt(b.ci_low)} to ${fmt(b.ci_high)}`}</td></tr>
-    <tr><td>p-value</td><td>${fmt(a.p, 4)}</td><td>${fmt(b.p, 4)}</td></tr>
-    <tr><td>Observations</td><td>${a.N === null ? '—' : Number(a.N).toLocaleString()}</td><td>${b.N === null ? '—' : Number(b.N).toLocaleString()}</td></tr>
-    <tr><td>Fixed effects</td><td>${esc(a.fixed_effects || 'None')}</td><td>${esc(b.fixed_effects || 'None')}</td></tr>
-  </tbody></table>`;
-  const ca = Object.fromEntries(a.coefficients.map(x => [x.variable, x]));
-  const cb = Object.fromEntries(b.coefficients.map(x => [x.variable, x]));
-  const vars = [...new Set([...a.coefficients.map(x=>x.variable), ...b.coefficients.map(x=>x.variable)])];
-  document.querySelector('#coefficients').innerHTML = `<table><thead><tr><th>Variable</th><th>A beta</th><th>A SE</th><th>B beta</th><th>B SE</th></tr></thead><tbody>${vars.map(v => {
-    const x=ca[v], y=cb[v]; return `<tr><td>${esc(v)}</td><td class="${betaClass(x?.beta)}">${fmt(x?.beta)}</td><td>${fmt(x?.se)}</td><td class="${betaClass(y?.beta)}">${fmt(y?.beta)}</td><td>${fmt(y?.se)}</td></tr>`;
-  }).join('')}</tbody></table>`;
-  document.querySelector('#status').textContent = 'Positive coefficients are shown in red; negative coefficients in green. This is an association comparison, not a causal-effect comparison.';
-}
-function refreshOptions(keepLeft=false) {
-  const items = optionsFor(modelSelect.value), oldA=leftSelect.value, oldB=rightSelect.value;
-  fillRegressionSelect(leftSelect, items); fillRegressionSelect(rightSelect, items);
-  if (keepLeft && items.some(r=>r.id===oldA)) leftSelect.value=oldA;
-  if (keepLeft && items.some(r=>r.id===oldB)) rightSelect.value=oldB;
-  if (leftSelect.options.length > 1 && leftSelect.value === rightSelect.value) rightSelect.selectedIndex=1;
-  render();
-}
-fetch('data/regressions.json').then(r => r.json()).then(data => {
-  records=data.records; const models=[...new Set(records.map(r=>r.model))].sort();
-  modelSelect.innerHTML=models.map(m=>`<option>${m}</option>`).join(''); modelSelect.value=models.includes('M2')?'M2':models[0];
-  refreshOptions(); modelSelect.addEventListener('change',()=>refreshOptions()); leftSelect.addEventListener('change',render); rightSelect.addEventListener('change',render);
-}).catch(err => { document.querySelector('#status').innerHTML=`<span class="error">Could not load comparison data: ${esc(err.message)}</span>`; });
-</script>
 </body>
 </html>

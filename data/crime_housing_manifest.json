@@ -1,0 +1,14 @@
+{
+  "rows": 549813,
+  "original_sha256": "358171a5f337d5ad53e665552b382096cdc7f566ae4ff8aba34679cdefea5b80",
+  "monthly_sha256": "9849c110ebb69c0c518126c09a60aa6f7fa5f5294ce22b28628c2e04c24de4fa",
+  "schema_version": 2,
+  "iv_columns": [
+    "residential_annual",
+    "residential_lagyear",
+    "residential_prior12",
+    "business_annual",
+    "business_lagyear",
+    "business_prior12"
+  ]
+}
