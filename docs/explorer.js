@@ -2,16 +2,18 @@ const $=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const name=x=>String(x).replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase());
 const groupName=id=>catalog.groups.find(g=>g.id===id)?.label||name(id.replace(/^\d+[_ -]*/, '').replace(/_outputs$/, ''));
-const fmt=(x,key='')=>x==null?'—':typeof x==='number'?key.toLowerCase().includes('p')&&x<.001?'<0.001':Number.isInteger(x)?x.toLocaleString():Math.abs(x)>0&&Math.abs(x)<.0001?x.toExponential(3):x.toFixed(4):esc(x);
+const fmt=(x,key='')=>x==null?'—':typeof x==='number'?((key==='p'||key.endsWith('_p')||key==='p-value')&&x<.001)?'<0.001':Number.isInteger(x)?x.toLocaleString():Math.abs(x)>0&&Math.abs(x)<.0001?x.toExponential(3):x.toFixed(4):esc(x);
 const cell=(v,key)=>key==='beta'?`<span class="${v>0?'positive':v<0?'negative':''}">${fmt(v)}</span>`:fmt(v);
 const url=p=>p.split('/').map(encodeURIComponent).join('/');
 const table=(heads,rows)=>`<table><thead><tr>${heads.map(h=>`<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((v,i)=>i?`<td>${v}</td>`:`<th scope="row">${v}</th>`).join('')}</tr>`).join('')}</tbody></table>`;
 let catalog, pool=[], diagnostics=[], selected=[], activeCoeffIndex=0, loaded=null, page=0, sortKey=null, ascending=true, request=0;
+const timingOf=r=>r.exposure_label||r.crime_exposure||r.exposure||r.timing||null;
+const timingLabel=r=>{const t=timingOf(r);return ({lagyear:'Previous year','previous-year':'Previous year','current-year':'Annual',prior12:'Prior 12 months',annual:'Annual',none:'Not applicable'})[t]||t||'Not specified';};
+const sourceOf=r=>r.data_source||((String(r.crime||'').startsWith('mps_')||r._iv||/\bmps\b/i.test(r.source||''))?'MPS':r.model||r.specification?'Original Stata':r.source||'Source unspecified');
 function rowLabel(r){
  const crime={allcrime:'All crime',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'Property-only benchmark'}[r.crime]||r.crime||(r._iv?'Residential burglary':'');
- const data=r.data_source||(r._iv||String(r.crime).startsWith('mps_')||/\bmps\b/i.test(r.source||'')?'MPS':r.model?'Original':'Source unspecified');
- const timing=r.exposure_label||r.exposure||r.timing;
- const time={lagyear:'prevyear','previous-year':'prevyear','current-year':'annual'}[timing]||timing||'Timing unspecified';
+ const data=sourceOf(r);
+ const time=timingLabel(r);
  const estimator=r.method==='2SLS'?'IV':r.method||r.estimator||(r.quantile!=null?'Quantile':r._family==='Spatial regressions'?'Spatial':'OLS');
  const model=r.model||r.specification||(r.quantile!=null?`Q${Number((r.quantile*100).toFixed(2))}`:'Model unspecified');
  return [model,estimator,data,time,crime,r.quantile!=null&&r.specification?`Q${r.quantile*100}`:null,r.k!=null?`${r.k} neighbours`:null].filter(Boolean).join(' · ');
@@ -22,10 +24,12 @@ function renderFullCoefficients(index){
  const coeff=r.coefficients||[];
  $('coeff-title').textContent=`${rowLabel(r)} · Full regression`;
  $('copy-coeff').dataset.copyCoeff=String(index);
- if(!coeff.length){$('coeff-content').innerHTML='<p class="note">No matching full coefficient export was found for this result.</p>';return;}
+ const stats=[['Observations (N)',fmt(r.N)],['R²',fmt(r.r2)],['Clusters',fmt(r.clusters)]];
+ const statsTable=table(['Model statistic','Value'],stats.map(([k,v])=>[esc(k),v]));
+ if(!coeff.length){$('coeff-content').innerHTML=`${statsTable}<p class="note">No matching full coefficient export was found for this result.</p>`;return;}
  const cols=['variable','beta','se','t','p','ci_low','ci_high'].filter(k=>r.coefficient_columns?.includes(k));
  const headings={variable:'Variable',beta:'Coefficient',se:'Standard error',t:'t statistic',p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper'};
- $('coeff-content').innerHTML=table(cols.map(k=>headings[k]||name(k)),coeff.map(c=>cols.map(k=>k==='variable'?esc(c[k]):fmt(c[k],k))));
+ $('coeff-content').innerHTML=`${statsTable}<p class="note">Clusters is the number of geographic cluster groups used for clustered standard errors. Clustering allows errors to be correlated within a group; it is not the number of observations.</p>${table(cols.map(k=>headings[k]||name(k)),coeff.map(c=>cols.map(k=>k==='variable'?esc(c[k]):fmt(c[k],k))))}`;
 }
 const options=()=>pool;
 function prepareComparisons(){
@@ -34,7 +38,7 @@ function prepareComparisons(){
   const iv=family.columns.includes('first_stage_wald_F')||family.rows.some(r=>r.method==='2SLS');
   for(const row of family.rows){
    if(iv&&!['2SLS','OLS','TWFE'].includes(row.method)){diagnostics.push({...row,analysis:family.label});continue;}
-   const identity=JSON.stringify([family.id==='main'?'main':family.id.split('/')[0],...['model','panel','exposure','exposure_label','specification','method','crime','quantile','k','N','beta'].map(k=>row[k]??null)]);
+   const identity=JSON.stringify([family.id==='main'?'main':family.id.split('/')[0],...['model','panel','specification','method','crime','quantile','k','N','beta'].map(k=>row[k]??null),timingOf(row)]);
    const candidate={...row,id:identity,_iv:iv,_family:family.id==='main'?'Main regressions':iv?'IV and matched OLS/TWFE':row.quantile!=null?'Quantile regressions':'Spatial regressions',analysis:family.label};
    const previous=unique.get(identity);
    if(!previous||Object.keys(row).length>Object.keys(previous).length-4)unique.set(identity,candidate);
@@ -62,10 +66,23 @@ function renderCompare(){
  const headers=selected.map((id,i)=>`<th class="column-head" scope="col"><div class="column-control"><select id="r${i}" aria-label="Regression for column ${i+1}" title="${esc(rowLabel(rows.find(r=>r.id===id)))}" data-select="${i}">${[...new Set(rows.map(r=>r._family))].map(group=>`<optgroup label="${esc(group)}">${rows.filter(r=>r._family===group).map(r=>`<option value="${esc(r.id)}" ${r.id===id?'selected':''}>${esc(rowLabel(r))}</option>`).join('')}</optgroup>`).join('')}</select><button class="column-remove" data-remove="${i}" aria-label="Remove comparison ${i+1}" title="Remove column" ${selected.length<=2?'disabled':''}>×</button></div><button class="full-model-button" data-open-coeff="${i}">Full regression</button></th>`).join('');
  const atLimit=selected.length>=5||selected.length>=rows.length;
  const chosen=selected.map(id=>rows.find(r=>r.id===id));
- const preferred=['model','method','data_source','crime','exposure_label','exposure','quantile','specification','k','beta','se','bootstrap_se','ci_low','ci_high','p','N','clusters','first_stage_wald_F','partial_R2','AR_95_set','bootstrap_success','fixed_effects','r2','r2_type'];
- const fields=[...new Set([...preferred,...chosen.flatMap(Object.keys)])].filter(k=>!k.startsWith('_')&&!['id','source','output','analysis','panel','coefficients','coefficient_columns','coefficient_source'].includes(k)&&chosen.some(r=>r[k]!=null)&&!chosen.some(r=>Array.isArray(r[k])||typeof r[k]==='object'));
+ const fields=['model','crime','canonical_exposure','beta','se','p','ci_low','ci_high','N','r2'].filter(k=>k!=='r2'||chosen.some(r=>r.r2!=null));
+ const labels={model:'Model / estimator',crime:'Crime measure',canonical_exposure:'Crime data · exposure',beta:'β̂',se:'SE',p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper',N:'N',r2:'R²'};
+ const shown=(r,k)=>{
+  if(k==='crime')return ({allcrime:'All crime',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'None (benchmark)'})[r[k]]||r[k]||'—';
+  if(k==='model'){
+   const base=r.model||(r.quantile!=null?`Q${Number((r.quantile*100).toFixed(0))}`:r.specification)||'—';
+   const estimator=r.method||(r.estimator)||(r.quantile!=null?'Quantile':r.model?'OLS':r._family==='Spatial regressions'?'Spatial':'');
+   return estimator?`${base} · ${estimator}`:base;
+  }
+  if(k==='canonical_exposure'){
+   const timing=timingLabel(r);
+   return `${sourceOf(r)} · ${timing}`;
+  }
+  return fmt(r[k],k);
+ };
  const scroll=$('comparison').scrollLeft;
- $('comparison').innerHTML=`<table style="--comparison-count:${selected.length}"><thead><tr><th scope="col">Statistic</th>${headers}<th class="add-column" scope="col"><button data-add="true" aria-label="Add comparison column" title="${atLimit?'Comparison limit reached':'Add comparison'}" ${atLimit?'disabled':''}>+</button></th></tr></thead><tbody>${fields.map(k=>`<tr><th scope="row">${esc(name(k))}</th>${chosen.map(r=>`<td>${cell(r[k],k)}</td>`).join('')}<td class="add-column"></td></tr>`).join('')}</tbody></table>`;
+ $('comparison').innerHTML=`<table style="--comparison-count:${selected.length}"><thead><tr><th scope="col">Statistic</th>${headers}<th class="add-column" scope="col"><button data-add="true" aria-label="Add comparison column" title="${atLimit?'Comparison limit reached':'Add comparison'}" ${atLimit?'disabled':''}>+</button></th></tr></thead><tbody>${fields.map(k=>`<tr><th scope="row">${esc(labels[k])}</th>${chosen.map(r=>`<td>${shown(r,k)}</td>`).join('')}<td class="add-column"></td></tr>`).join('')}</tbody></table>`;
  $('comparison').scrollLeft=scroll;
  if($('coeff-dialog').open)renderFullCoefficients(activeCoeffIndex);
  $('context').textContent='Cross-analysis comparisons are descriptive: IV targets residential burglary, quantiles target conditional price percentiles, and spatial models may use area-year observations. Check the crime definition, sample, timing and fixed effects in each column. M1 has no crime coefficient.';
@@ -95,8 +112,9 @@ document.addEventListener('click',async e=>{
   const cols=['variable','beta','se','t','p','ci_low','ci_high'].filter(k=>r.coefficient_columns?.includes(k));
   const heading={variable:'Variable',beta:'Coefficient',se:'Standard error',t:'t statistic',p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper'};
   const safe=x=>esc(x==null?'':x);
-  const html=`<table border="1" style="border-collapse:collapse"><caption>${safe(rowLabel(r))} · Full regression</caption><thead><tr>${cols.map(k=>`<th>${safe(heading[k]||name(k))}</th>`).join('')}</tr></thead><tbody>${(r.coefficients||[]).map(row=>`<tr>${cols.map(k=>`<td>${safe(k==='variable'?row[k]:fmt(row[k],k))}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-  const plain=[cols.map(k=>heading[k]||name(k)).join('\t'),...(r.coefficients||[]).map(row=>cols.map(k=>row[k]??'').join('\t'))].join('\n');
+  const stats=[['Observations (N)',fmt(r.N)],['R²',fmt(r.r2)],['Clusters',fmt(r.clusters)]];
+  const html=`<table border="1" style="border-collapse:collapse"><caption>${safe(rowLabel(r))} · Model statistics</caption><tbody>${stats.map(([k,v])=>`<tr><th>${safe(k)}</th><td>${safe(v)}</td></tr>`).join('')}</tbody></table><br><table border="1" style="border-collapse:collapse"><caption>${safe(rowLabel(r))} · Full regression</caption><thead><tr>${cols.map(k=>`<th>${safe(heading[k]||name(k))}</th>`).join('')}</tr></thead><tbody>${(r.coefficients||[]).map(row=>`<tr>${cols.map(k=>`<td>${safe(k==='variable'?row[k]:fmt(row[k],k))}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const plain=[['Model statistic','Value'],...stats,...[[''],cols.map(k=>heading[k]||name(k)),...(r.coefficients||[]).map(row=>cols.map(k=>row[k]??''))]].map(line=>Array.isArray(line)?line.join('\t'):line).join('\n');
   try{
    if(navigator.clipboard?.write&&window.ClipboardItem){
     await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);
