@@ -33,7 +33,7 @@ def value(text):
 
 def build():
     DEST.mkdir(parents=True, exist_ok=True)
-    files, groups, families, diagnostics = [], [], [], []
+    files, groups, families, diagnostics, coefficient_tables = [], [], [], [], []
     main = []
     # Only folders designated as notebook outputs are published.
     for folder in sorted((ROOT / 'data').glob('*outputs')):
@@ -61,11 +61,13 @@ def build():
                 item.update(columns=columns, rows=len(rows), json=url[:-4]+'.json')
                 if {'clustered_wooldridge_chi2', 'clustered_wooldridge_p', 'classical_wu_hausman_p'} <= set(columns):
                     diagnostics.append(dict(title=group['label'] + ' · Endogeneity tests', columns=columns, rows=rows))
+                if {'variable', 'beta'} <= set(columns):
+                    coefficient_tables.append(dict(group=folder.name, columns=columns, rows=rows, title=item['title']))
                 # Identify statistical summaries by schema, not filename.
                 if {'model','crime','beta','N','panel'} <= set(columns) and 'variable' not in columns:
                     for row in rows:
                         key = json.dumps([folder.name,row],sort_keys=True)
-                        main.append(dict(row, id=hashlib.sha256(key.encode()).hexdigest()[:20], source=group['label'], output=item['title']))
+                        main.append(dict(row, id=hashlib.sha256(key.encode()).hexdigest()[:20], source=group['label'], output=item['title'], _group=folder.name))
                 elif {'beta','N'} <= set(columns) and 'variable' not in columns and any(c in columns for c in ['method','quantile','specification']):
                     families.append(dict(id=item['id'], label=group['label']+' · '+item['title'], columns=columns,
                                          rows=[dict(r,id=str(i)) for i,r in enumerate(rows)]))
@@ -73,7 +75,28 @@ def build():
             group['files'] += 1
     # Some notebooks export both individual and combined summaries. Deduplicate these.
     unique = {r['id']: r for r in main}
+    keys = ['panel', 'model', 'crime', 'exposure', 'specification', 'method', 'quantile', 'k']
+    def attach_coefficients(regression, folder):
+        matches = []
+        for table_data in coefficient_tables:
+            if table_data['group'] != folder:
+                continue
+            shared = [k for k in keys if k in regression and k in table_data['columns']]
+            selected_rows = [row for row in table_data['rows'] if shared and all(row.get(k) == regression.get(k) for k in shared)]
+            if selected_rows:
+                matches.append((len(selected_rows), table_data, selected_rows))
+        if matches:
+            _, source_table, selected_rows = max(matches, key=lambda x: len(x[2]))
+            regression['coefficients'] = selected_rows
+            regression['coefficient_columns'] = source_table['columns']
+            regression['coefficient_source'] = source_table['title']
+    for family in families:
+        folder = family['id'].split('/')[0]
+        for regression in family['rows']:
+            attach_coefficients(regression, folder)
     if unique:
+        for regression in unique.values():
+            attach_coefficients(regression, regression['_group'])
         families.insert(0,dict(id='main',label='Main regressions · shared model',rows=list(unique.values()),
                                columns=list(dict.fromkeys(k for r in unique.values() for k in r if k!='id'))))
     catalog = dict(built_at=datetime.now(timezone.utc).isoformat(),groups=groups,files=files,families=families,diagnostics=diagnostics)

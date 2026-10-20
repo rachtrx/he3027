@@ -56,6 +56,13 @@ function renderCompare(){
  const scroll=$('comparison').scrollLeft;
  $('comparison').innerHTML=`<table><thead><tr><th scope="col">Statistic</th>${headers}<th class="add-column" scope="col"><button data-add="true" aria-label="Add comparison column" title="${atLimit?'Comparison limit reached':'Add comparison'}" ${atLimit?'disabled':''}>+</button></th></tr></thead><tbody>${fields.map(k=>`<tr><th scope="row">${esc(name(k))}</th>${chosen.map(r=>`<td>${cell(r[k],k)}</td>`).join('')}<td class="add-column"></td></tr>`).join('')}</tbody></table>`;
  $('comparison').scrollLeft=scroll;
+ $('full-regressions').innerHTML=chosen.map((r,i)=>{
+  const coeff=r.coefficients||[];
+  if(!coeff.length)return `<details class="full-regression"><summary>${esc(rowLabel(r))} · Full regression</summary><p class="note">No matching full-coefficient export was found for this result.</p></details>`;
+  const cols=['variable','beta','se','t','p','ci_low','ci_high'].filter(k=>r.coefficient_columns?.includes(k));
+  const shown=coeff.map(c=>cols.map(k=>k==='variable'?esc(c[k]):fmt(c[k],k)));
+  return `<details class="full-regression"><summary>${esc(rowLabel(r))} · Full regression (${coeff.length} terms)</summary><button data-copy-coeff="${i}">Copy table</button><div class="table-wrap">${table(cols.map(k=>k==='variable'?'Variable':k==='beta'?'Coefficient':k==='se'?'Standard error':k==='p'?'p-value':k==='ci_low'?'95% CI lower':k==='ci_high'?'95% CI upper':name(k)),shown)}</div></details>`;
+ }).join('');
  $('context').textContent='Cross-analysis comparisons are descriptive: IV targets residential burglary, quantiles target conditional price percentiles, and spatial models may use area-year observations. Check the crime definition, sample, timing and fixed effects in each column. M1 has no crime coefficient.';
 }
 function matches(item){return(!$('group').value||item.group===$('group').value)&&(`${item.title} ${item.group}`.toLowerCase().includes($('search').value.toLowerCase()));}
@@ -78,6 +85,7 @@ document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
  if(b.dataset.remove!=null&&selected.length>2){const index=+b.dataset.remove;selected.splice(index,1);renderCompare();document.getElementById(`r${Math.min(index,selected.length-1)}`)?.focus();}
  if(b.dataset.add&&selected.length<5){const next=options().find(r=>!selected.includes(r.id));if(next){selected.push(next.id);renderCompare();document.getElementById(`r${selected.length-1}`)?.focus();}}
+ if(b.dataset.copyCoeff!=null){const r=options().find(r=>r.id===selected[+b.dataset.copyCoeff]);if(r){const cols=['variable','beta','se','t','p','ci_low','ci_high'].filter(k=>r.coefficient_columns?.includes(k));const tsv=[cols.join('\t'),...(r.coefficients||[]).map(row=>cols.map(k=>row[k]??'').join('\t'))].join('\n');try{await navigator.clipboard.writeText(tsv);b.textContent='Copied';setTimeout(()=>b.textContent='Copy table',1400);}catch{const area=document.createElement('textarea');area.value=tsv;document.body.append(area);area.select();document.execCommand('copy');area.remove();b.textContent='Copied';setTimeout(()=>b.textContent='Copy table',1400);}}}
  if(b.dataset.open){const f=catalog.files.find(f=>f.id===b.dataset.open);$('large-image').src=url(f.url);$('large-image').alt=f.title;$('image-title').textContent=f.title;$('image-dialog').showModal();}
  if(b.dataset.table){const f=catalog.files.find(f=>f.id===b.dataset.table),token=++request;loaded=null;$('table-title').textContent=f.title;$('preview').textContent='Loading…';$('page').textContent='';$('prev').disabled=true;$('next').disabled=true;$('table-dialog').showModal();try{const r=await fetch(url(f.json));if(!r.ok)throw Error(`HTTP ${r.status}`);const data=await r.json();if(token!==request)return;loaded=data;page=0;sortKey=null;ascending=true;$('direction').textContent='Ascending';$('row-search').value='';$('sort').innerHTML='<option value="">Original order</option>'+loaded.columns.map(c=>`<option value="${esc(c)}">${esc(name(c))}</option>`).join('');renderTable();}catch(err){if(token===request){loaded=null;$('preview').textContent=`Could not load table: ${err.message}`;}}}
 });

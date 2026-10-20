@@ -8,7 +8,7 @@
     :root { color-scheme: light; --ink:#182230; --muted:#637083; --line:#dce3ec; --blue:#1769aa; --bg:#f5f7fa; }
     * { box-sizing: border-box; }
     body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif; }
-    main { max-width:1280px; margin:0 auto; padding:34px 20px 60px; }
+    main { width:100%; max-width:none; margin:0; padding:28px clamp(12px,2vw,32px) 60px; }
     h1 { margin:0 0 8px; font-size:clamp(25px,4vw,38px); letter-spacing:-.02em; }
     h2 { margin:0 0 14px; font-size:20px; }
     p { color:var(--muted); }
@@ -37,7 +37,8 @@
     .note { font-size:13px; color:var(--muted); }
     .error { color:#a33b22; }
     .output-title {margin:0 0 6px;font-size:16px;line-height:1.4} .output-actions {display:flex;align-items:center;gap:14px;margin-top:10px} dialog::backdrop {background:rgba(15,23,42,.65)} #table-dialog {width:min(1200px,94vw);padding:20px} #table-dialog #preview {max-height:60vh;margin-top:16px} #table-dialog thead th {position:sticky;top:0} .dialog-heading {display:flex;align-items:center;justify-content:space-between;gap:16px}
-    #comparison {max-height:75vh;overflow:auto;scroll-behavior:smooth} #comparison table {width:max-content;min-width:100%;table-layout:auto} #comparison thead th {position:sticky;top:0;z-index:2;text-transform:none;letter-spacing:normal;vertical-align:top} #comparison th:first-child {position:sticky;left:0;background:#f3f6fa;min-width:110px;width:110px;max-width:150px;z-index:1} #comparison thead th:first-child {z-index:3} #comparison .column-head {min-width:0;width:1%;max-width:170px;padding:6px} .column-control {display:flex;align-items:center;gap:2px;min-width:0;width:100%;max-width:170px} .column-control select {width:100%;min-width:0;max-width:130px;margin:0;padding:5px 2px;font-size:11px;text-overflow:ellipsis} .column-remove {flex:none;border:0!important;background:transparent;color:var(--muted);font-size:16px!important;padding:2px} #comparison .add-column {min-width:40px;width:40px;padding:5px;background:#f3f6fa} .add-column button {border-radius:50%;width:30px;height:30px;padding:0;font-size:21px;background:white;color:var(--blue)} #comparison td {min-width:72px;max-width:140px;padding:8px 6px;font-size:13px;overflow-wrap:anywhere} @media(max-width:650px){#comparison .column-head{max-width:135px}.column-control{max-width:135px}.column-control select{max-width:100px;font-size:10px}#comparison th:first-child{min-width:90px;width:90px}} @media(prefers-reduced-motion:reduce){#comparison{scroll-behavior:auto}}
+    .full-regression {margin:8px 0;border:1px solid var(--line);border-radius:8px;background:white}.full-regression summary {padding:12px;font-weight:600}.full-regression button {margin:0 12px 10px}.full-regression .table-wrap {max-height:none;overflow-x:auto;overflow-y:visible;margin:0 12px 12px}.full-regression table {width:max-content;min-width:100%}.full-regression th,.full-regression td {padding:7px 10px}
+    #comparison {max-height:none;overflow-x:auto;overflow-y:visible;scroll-behavior:smooth;overscroll-behavior-x:contain} #comparison table {width:max-content;min-width:100%;table-layout:auto} #comparison thead th {position:sticky;top:0;z-index:2;text-transform:none;letter-spacing:normal;vertical-align:top} #comparison th:first-child {position:sticky;left:0;background:#f3f6fa;min-width:110px;width:110px;max-width:150px;z-index:1} #comparison thead th:first-child {z-index:3} #comparison .column-head {min-width:0;width:1%;max-width:170px;padding:6px} .column-control {display:flex;align-items:center;gap:2px;min-width:0;width:100%;max-width:170px} .column-control select {width:100%;min-width:0;max-width:130px;margin:0;padding:5px 2px;font-size:11px;text-overflow:ellipsis} .column-remove {flex:none;border:0!important;background:transparent;color:var(--muted);font-size:16px!important;padding:2px} #comparison .add-column {min-width:40px;width:40px;padding:5px;background:#f3f6fa} .add-column button {border-radius:50%;width:30px;height:30px;padding:0;font-size:21px;background:white;color:var(--blue)} #comparison td {min-width:72px;max-width:200px;padding:8px 6px;font-size:13px;overflow-wrap:anywhere} @media(max-width:650px){main{padding:18px 10px 40px}#comparison .column-head{max-width:135px}.column-control{max-width:135px}.column-control select{max-width:100px;font-size:10px}#comparison th:first-child{min-width:90px;width:90px}} @media(prefers-reduced-motion:reduce){#comparison{scroll-behavior:auto}}
     [hidden] {display:none!important} .gallery,.file-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px} article {padding:12px;border:1px solid var(--line);border-radius:8px;background:white} article small {display:block;color:var(--muted)} .gallery img,#pinned img {width:100%;height:210px;object-fit:contain} .image-button {width:100%;border:0;background:white} #pinned {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px} #pinned img {height:auto} .filters {display:flex;gap:12px;flex-wrap:wrap;align-items:end} input,button {font:inherit;padding:9px;border:1px solid #bac5d3;border-radius:6px} button:disabled {opacity:.45;cursor:default} nav {display:flex;gap:20px;margin:20px 0} a {color:var(--blue)} dialog {max-width:96vw;max-height:95vh;border:0;border-radius:12px} dialog img {max-width:90vw;max-height:78vh;object-fit:contain} :focus-visible {outline:3px solid var(--blue);outline-offset:2px}
     @media (max-width:760px) { .controls,.cards { grid-template-columns:1fr; } .stats { grid-template-columns:repeat(2,1fr); } }
   </style>
@@ -56,6 +57,7 @@
       <p class="note">Choose a regression in each column header. Use + to add a column (up to five).</p>
     </div>
     <div id="comparison" class="table-wrap"></div>
+    <div id="full-regressions"></div>
     <details><summary>How to interpret comparisons</summary><p id="context" class="note"></p></details>
     <p class="note">A dash means unavailable. Results describe associations unless a valid causal design is established. Full coefficient tables are available under All tables.</p>
   </section>
@@ -70,7 +72,7 @@
 </main>
 <dialog id="image-dialog" aria-labelledby="image-title"><button id="close-image">Close</button><h2 id="image-title"></h2><img id="large-image" alt=""></dialog>
 <dialog id="table-dialog" aria-labelledby="table-title"><div class="dialog-heading"><h2 id="table-title"></h2><button id="close-table">Close</button></div><div class="filters"><label>Search rows<input id="row-search" type="search"></label><label>Sort by<select id="sort"></select></label><button id="direction">Ascending</button></div><div id="preview" class="table-wrap" aria-live="polite"></div><button id="prev">Previous</button> <span id="page"></span> <button id="next">Next</button></dialog>
-<script src="explorer.js?v=b6cb28278e028a5d"></script>
+<script src="explorer.js?v=da9bd48e0a166e15"></script>
 
 </body>
 </html>
