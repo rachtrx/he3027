@@ -1,6 +1,6 @@
 # Regression comparison dashboard
 
-Each of up to five comparison columns selects independently across model numbers and analysis types. The **Advanced regressions (include IV)** checkbox is off by default: main, quantile and spatial results are available without it. Enabling it also exposes 2SLS and the IV notebook's matched OLS/TWFE benchmarks. First-stage, reduced-form and IV diagnostic summaries are in a separate expandable section, not the regression selector. Turning the checkbox off removes IV-family selections while retaining the other columns.
+Each of up to five comparison columns selects independently using its header dropdown. Options are grouped in this order: main regressions, IV and matched OLS/TWFE, quantiles, spatial regressions. All are always available. First-stage, reduced-form and IV diagnostic summaries remain in a separate expandable section. Each build versions the JavaScript URL to prevent outdated cached scripts from breaking the updated page.
 
 ## Automatic discovery
 

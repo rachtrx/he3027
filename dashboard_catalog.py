@@ -22,6 +22,8 @@ def title(value):
 def value(text):
     if text is None or text.strip() in ('', 'NaN', 'nan', 'NA'):
         return None
+    if text.strip().lower() in ('true', 'false'):
+        return text.strip().lower() == 'true'
     try:
         n = float(text)
         return n if math.isfinite(n) else None
@@ -31,7 +33,7 @@ def value(text):
 
 def build():
     DEST.mkdir(parents=True, exist_ok=True)
-    files, groups, families = [], [], []
+    files, groups, families, diagnostics = [], [], [], []
     main = []
     # Only folders designated as notebook outputs are published.
     for folder in sorted((ROOT / 'data').glob('*outputs')):
@@ -57,6 +59,8 @@ def build():
                 json_target = target.with_suffix('.json')
                 json_target.write_text(json.dumps(dict(columns=columns, rows=rows), allow_nan=False), encoding='utf-8')
                 item.update(columns=columns, rows=len(rows), json=url[:-4]+'.json')
+                if {'clustered_wooldridge_chi2', 'clustered_wooldridge_p', 'classical_wu_hausman_p'} <= set(columns):
+                    diagnostics.append(dict(title=group['label'] + ' · Endogeneity tests', columns=columns, rows=rows))
                 # Identify statistical summaries by schema, not filename.
                 if {'model','crime','beta','N','panel'} <= set(columns) and 'variable' not in columns:
                     for row in rows:
@@ -72,8 +76,17 @@ def build():
     if unique:
         families.insert(0,dict(id='main',label='Main regressions · shared model',rows=list(unique.values()),
                                columns=list(dict.fromkeys(k for r in unique.values() for k in r if k!='id'))))
-    catalog = dict(built_at=datetime.now(timezone.utc).isoformat(),groups=groups,files=files,families=families)
+    catalog = dict(built_at=datetime.now(timezone.utc).isoformat(),groups=groups,files=files,families=families,diagnostics=diagnostics)
     (DEST/'catalog.json').write_text(json.dumps(catalog,allow_nan=False),encoding='utf-8')
+    script = ROOT / 'docs' / 'explorer.js'
+    page = ROOT / 'docs' / 'index.html'
+    if script.exists() and page.exists():
+        version = hashlib.sha256(script.read_bytes()).hexdigest()[:16]
+        html, count = re.subn(r'src="explorer\.js(?:\?[^\"]*)?"',
+                              f'src="explorer.js?v={version}"', page.read_text(encoding='utf-8'))
+        if count != 1:
+            raise ValueError('Expected one explorer.js script reference')
+        page.write_text(html, encoding='utf-8')
     print(f'Discovered {len(files)} outputs across {len(groups)} folders; {len(families)} comparison families.')
 
 
