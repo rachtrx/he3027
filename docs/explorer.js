@@ -152,6 +152,7 @@ function renderTable(){
 }
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
+ if(b.id==='reset-comparison'){selected=defaultPreset().map(r=>r.id);renderCompare();return;}
  if(b.dataset.shortcut){applyShortcut(b);return;}
  if(b.dataset.remove!=null&&selected.length>2){const index=+b.dataset.remove;selected.splice(index,1);renderCompare();document.getElementById(`r${Math.min(index,selected.length-1)}`)?.focus();}
  if(b.dataset.add){const next=options().find(r=>!selected.includes(r.id));if(next){selected.push(next.id);renderCompare();document.getElementById(`r${selected.length-1}`)?.focus();}}
