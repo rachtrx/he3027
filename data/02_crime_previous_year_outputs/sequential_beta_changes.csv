@@ -1,0 +1,16 @@
+,crime,exposure,model,beta_change
+0,allcrime,lagyear,M3,-0.0508463702122571
+1,allcrime,lagyear,M4,-0.0423224781202307
+2,allcrime,lagyear,M5,0.029333920161186702
+3,allcrime,lagyear,M6,8.043214325680059e-05
+4,allcrime,lagyear,M7,0.0123243208937408
+5,violent_crime,lagyear,M3,0.021752933087260003
+6,violent_crime,lagyear,M4,-0.0745099813235079
+7,violent_crime,lagyear,M5,0.067796179003938
+8,violent_crime,lagyear,M6,9.758526028979739e-05
+9,violent_crime,lagyear,M7,0.0231437249732158
+10,propertycrime,lagyear,M3,-0.0459568441154493
+11,propertycrime,lagyear,M4,-0.019737871437089
+12,propertycrime,lagyear,M5,0.0182342885681477
+13,propertycrime,lagyear,M6,0.00013797072292469998
+14,propertycrime,lagyear,M7,0.0060603428000799

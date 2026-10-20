@@ -1,0 +1,98 @@
+#!/usr/bin/env python3
+"""Build the compact, browser-friendly regression data for GitHub Pages."""
+
+import csv
+import json
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+DATA = ROOT / "data"
+OUT = ROOT / "docs" / "data" / "regressions.json"
+
+SOURCES = [
+    ("stata_current", "Original Stata crime", "current-year", "01_crime_current_year_outputs", "annual"),
+    ("stata_previous", "Original Stata crime", "previous-year", "02_crime_previous_year_outputs", "lagyear"),
+    ("mps_annual", "MPS crime", "annual", "03_crime_mps_outputs", "annual"),
+    ("mps_lagyear", "MPS crime", "previous-year", "03_crime_mps_outputs", "lagyear"),
+    ("mps_prior12", "MPS crime", "prior 12 months", "03_crime_mps_outputs", "prior12"),
+]
+
+
+def read_csv(path):
+    with path.open(newline="", encoding="utf-8") as handle:
+        return list(csv.DictReader(handle))
+
+
+def number(value):
+    if value in (None, "", "NA", "NaN"):
+        return None
+    try:
+        return float(value)
+    except ValueError:
+        return value
+
+
+def display_crime(source_id, crime, exposure):
+    if crime == "no crime":
+        return f"{source_id} · M1 benchmark"
+    if source_id.startswith("stata"):
+        names = {"allcrime": "all crime", "violent_crime": "violent crime", "propertycrime": "property crime"}
+        return f"Stata {names.get(crime, crime)} · {exposure}"
+    names = {"mps_all": "MPS all crime", "mps_violence": "MPS violence", "mps_property": "MPS property crime"}
+    return f"{names.get(crime, crime)} · {exposure}"
+
+
+def main():
+    records = []
+    for source_id, source_label, timing_label, folder, exposure in SOURCES:
+        model_path = DATA / folder / ("primary_" + exposure + "_models.csv")
+        coefficient_path = DATA / folder / ("primary_" + exposure + "_all_coefficients.csv")
+        models = read_csv(model_path)
+        coefficients = read_csv(coefficient_path)
+        grouped = {}
+        for row in coefficients:
+            key = (row["model"], row["crime"])
+            grouped.setdefault(key, []).append({
+                "variable": row["variable"],
+                "beta": number(row["beta"]),
+                "se": number(row["se"]),
+                "p": number(row.get("p")),
+                "t": number(row.get("t")),
+                "ci_low": number(row.get("ci_low")),
+                "ci_high": number(row.get("ci_high")),
+            })
+        for row in models:
+            model = row["model"]
+            crime = row["crime"]
+            key = f"{source_id}::{exposure}::{model}::{crime}"
+            records.append({
+                "id": key,
+                "source_id": source_id,
+                "source": source_label,
+                "timing": timing_label,
+                "exposure": exposure,
+                "model": model,
+                "crime": crime,
+                "label": display_crime(source_id, crime, timing_label),
+                "N": number(row.get("N")),
+                "clusters": number(row.get("clusters")),
+                "beta": number(row.get("beta")),
+                "se": number(row.get("se")),
+                "p": number(row.get("p")),
+                "ci_low": number(row.get("ci_low")),
+                "ci_high": number(row.get("ci_high")),
+                "r2": number(row.get("r2")),
+                "r2_type": row.get("r2_type", ""),
+                "fixed_effects": row.get("fixed_effects", ""),
+                "absorbed_or_collinear": row.get("absorbed_or_collinear", ""),
+                "coefficients": grouped.get((model, crime), []),
+            })
+    records.sort(key=lambda r: (r["model"], r["source_id"], r["crime"]))
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    OUT.write_text(json.dumps({"version": 1, "records": records}, indent=2), encoding="utf-8")
+    print(f"Wrote {len(records)} regression records to {OUT}")
+
+
+if __name__ == "__main__":
+    main()

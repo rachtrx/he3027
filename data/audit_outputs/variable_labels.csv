@@ -1,0 +1,51 @@
+,stata_label
+price,Sale price stated on the transfer deed
+postalcode,Postalcode
+propertyty,"D = Detached, S = Semi-Detached, T = Terraced, F = Flats/Maisonettes, O = Other"
+age,Y= newly built ; N = established residential building
+duration,"F = Freehold, L= Leasehold etc. Note that Land Registry does not record leases o"
+year,Year Property was sold
+month,Month Property was sold
+day,
+OA01CD,
+OA11CD,Output Area (OA) Code 2011
+lsoacode,Lower Super Output Area (LSOA) 2011 Code
+msoa11,Middle Super Output Area (LSOA) 2011 Code
+transactiondates,transacted dates
+quarter,Quarter Property was sold
+yearquarter,year and quarter property was sold
+bus_distnear,Distance from nearest bus stop
+tube_distnear,Distance from nearest tube station
+thamesriv_dist,Distance from Thames River
+Bus_stopscount_200m,Counts of Bus stop in 200m buffer from property
+percent_noedu,Percentage of residents with no education qualification
+percent_minorities,Percentage of residents of minority race
+lone_hh,Percentage of lone (single) parent households
+detached_dum,=1 if property is a detached house
+flat_dum,=1 if property is a flat 
+semi_d_dum,=1 if property is a semi-detached house
+terrace_dum,=1 if property is a terrace house
+freehold,=1 if property is under freehold
+leasehold,=1 if property is under leasehold
+heritage_count_200m,Counts of Grade 1 heritage buildings 200m from property 
+Nearest_Park_dist,Distance from nearest grade 1 park
+postcode,
+oslaua,Local Areas District (LAD) Code
+lat,
+lon,long
+LA,
+area_code,
+descriptio,
+hectares,
+code_year,
+la_name,LA_name
+grossannualpay,Average Gross Annual Pay for residents living in LAD in a year
+hoursworked,Average number of hours worked (per week) for residents living in LAD in a year
+jobdensity,Number of jobs per unit area in LAD in a year
+totalpopulation,Population size
+unemployment,Unemployment rate in LAD in a year
+nid,
+dist_to_cbd,Distance to CBD (in km)
+allcrime,counts of all crimes in a year in LSOA
+violent_crime,counts of all violent crimes in a year in LSOA
+propertycrime,counts of all property crimes in a year in LSOA

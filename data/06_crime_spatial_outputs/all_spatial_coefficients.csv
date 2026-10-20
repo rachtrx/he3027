@@ -1,0 +1,238 @@
+variable,beta,se,specification,k,crime
+log1p_mps_all,0.016027764789176616,0.006155612687408957,Own crime only,8,mps_all
+detached_dum,0.5797430517424492,0.043584081644900075,Own crime only,8,mps_all
+semi_d_dum,0.29345214322888263,0.040134737743616436,Own crime only,8,mps_all
+terrace_dum,0.19189904368468938,0.038788710793672354,Own crime only,8,mps_all
+freehold,0.3887220523790024,0.03874163419481724,Own crime only,8,mps_all
+newbuild,0.21767209438437496,0.015978700184431063,Own crime only,8,mps_all
+tube_distnear_km,-0.00359854444574351,0.02844172530460071,Own crime only,8,mps_all
+bus_distnear_km,0.13190973284180582,0.05387341815035887,Own crime only,8,mps_all
+thamesriv_dist_km,-0.027640875830070053,0.028049127312307052,Own crime only,8,mps_all
+grossannualpay_k,-0.006307607150578156,0.0010504736508477092,Own crime only,8,mps_all
+hoursworked,-0.0015949448121049168,0.0026395984895589133,Own crime only,8,mps_all
+unemployment,-0.0023369201055207425,0.0011309121990938423,Own crime only,8,mps_all
+log1p_mps_violence,0.0010620851403137592,0.003266552536342096,Own crime only,8,mps_violence
+detached_dum,0.5794978930507286,0.043535278548243975,Own crime only,8,mps_violence
+semi_d_dum,0.29360723537612493,0.04006602040399207,Own crime only,8,mps_violence
+terrace_dum,0.19199629998220683,0.03871842035916229,Own crime only,8,mps_violence
+freehold,0.38835357315530517,0.03867235213175064,Own crime only,8,mps_violence
+newbuild,0.21713703109974972,0.016004093843086382,Own crime only,8,mps_violence
+tube_distnear_km,-0.004054689980802013,0.028438573459151593,Own crime only,8,mps_violence
+bus_distnear_km,0.13163895702567385,0.053846988497993076,Own crime only,8,mps_violence
+thamesriv_dist_km,-0.02779920827751515,0.028075556274099443,Own crime only,8,mps_violence
+grossannualpay_k,-0.006327227189531873,0.001049694208056043,Own crime only,8,mps_violence
+hoursworked,-0.0014069554473913125,0.0026397269910596872,Own crime only,8,mps_violence
+unemployment,-0.002350407566638555,0.0011313558859428166,Own crime only,8,mps_violence
+log1p_mps_property,0.014490287449936454,0.005209896444523251,Own crime only,8,mps_property
+detached_dum,0.5792491425749707,0.043647619631224537,Own crime only,8,mps_property
+semi_d_dum,0.2932956610387205,0.04021574334746251,Own crime only,8,mps_property
+terrace_dum,0.19163071799726003,0.038861371808655565,Own crime only,8,mps_property
+freehold,0.38887176250376054,0.0388195763959619,Own crime only,8,mps_property
+newbuild,0.21754917919457056,0.01597036033916276,Own crime only,8,mps_property
+tube_distnear_km,-0.0038011609419403834,0.028459414652437474,Own crime only,8,mps_property
+bus_distnear_km,0.1309881661754992,0.05385444160047425,Own crime only,8,mps_property
+thamesriv_dist_km,-0.02751667893230578,0.028052326711623866,Own crime only,8,mps_property
+grossannualpay_k,-0.006336681506054031,0.0010496873248564042,Own crime only,8,mps_property
+hoursworked,-0.0016162940085687957,0.0026423829295640824,Own crime only,8,mps_property
+unemployment,-0.0023371096847882634,0.0011306639219982677,Own crime only,8,mps_property
+log1p_mps_all,0.014657975578440376,0.006487178248185405,Add neighbour crime,8,mps_all
+detached_dum,0.5796879068697867,0.04352789779639396,Add neighbour crime,8,mps_all
+semi_d_dum,0.29351854440206887,0.04007867139678258,Add neighbour crime,8,mps_all
+terrace_dum,0.19208201818503173,0.03873828332889124,Add neighbour crime,8,mps_all
+freehold,0.38860457575767665,0.03869188068781278,Add neighbour crime,8,mps_all
+newbuild,0.21771833591477638,0.015987659231021734,Add neighbour crime,8,mps_all
+tube_distnear_km,-0.0034764622518819546,0.02844287745494803,Add neighbour crime,8,mps_all
+bus_distnear_km,0.13181494552088657,0.053898227555579874,Add neighbour crime,8,mps_all
+thamesriv_dist_km,-0.02768394959540892,0.02804229234686366,Add neighbour crime,8,mps_all
+grossannualpay_k,-0.006302964530829112,0.0010501996121927547,Add neighbour crime,8,mps_all
+hoursworked,-0.0017104677358168808,0.002642531409093503,Add neighbour crime,8,mps_all
+unemployment,-0.0023414886913412595,0.0011312233778283654,Add neighbour crime,8,mps_all
+W_mps_all,0.010826275744162183,0.014229015786460845,Add neighbour crime,8,mps_all
+log1p_mps_violence,0.0012256945194952797,0.003273228012190282,Add neighbour crime,8,mps_violence
+detached_dum,0.579617541524985,0.04356690570473113,Add neighbour crime,8,mps_violence
+semi_d_dum,0.29382424599513995,0.040104188233585844,Add neighbour crime,8,mps_violence
+terrace_dum,0.19202708529240906,0.03874356855302962,Add neighbour crime,8,mps_violence
+freehold,0.3882363725545582,0.03870667046653529,Add neighbour crime,8,mps_violence
+newbuild,0.21713614973498324,0.016002948490690422,Add neighbour crime,8,mps_violence
+tube_distnear_km,-0.004267147298751923,0.028447662760479112,Add neighbour crime,8,mps_violence
+bus_distnear_km,0.13152411882180096,0.053858850759825584,Add neighbour crime,8,mps_violence
+thamesriv_dist_km,-0.027741574477625767,0.02808081720819586,Add neighbour crime,8,mps_violence
+grossannualpay_k,-0.006292750510587916,0.0010491881232914902,Add neighbour crime,8,mps_violence
+hoursworked,-0.0012587013022148856,0.002637192571384877,Add neighbour crime,8,mps_violence
+unemployment,-0.002296009847693935,0.001131605733805403,Add neighbour crime,8,mps_violence
+W_mps_violence,-0.010297857019821392,0.008887438626748222,Add neighbour crime,8,mps_violence
+log1p_mps_property,0.012706690108736277,0.005477319546180507,Add neighbour crime,8,mps_property
+detached_dum,0.5794399736651977,0.043576119374647955,Add neighbour crime,8,mps_property
+semi_d_dum,0.29363213068057975,0.040143055127727575,Add neighbour crime,8,mps_property
+terrace_dum,0.19208199631092873,0.03879312865552523,Add neighbour crime,8,mps_property
+freehold,0.3883284755349838,0.0387672498999561,Add neighbour crime,8,mps_property
+newbuild,0.21758335584675376,0.015979210194540357,Add neighbour crime,8,mps_property
+tube_distnear_km,-0.003699241792148783,0.0284590626544012,Add neighbour crime,8,mps_property
+bus_distnear_km,0.1307417975585185,0.053910591074812705,Add neighbour crime,8,mps_property
+thamesriv_dist_km,-0.0275117952035341,0.02804001879088713,Add neighbour crime,8,mps_property
+grossannualpay_k,-0.006349679955280994,0.001049360449520979,Add neighbour crime,8,mps_property
+hoursworked,-0.0017693856700529856,0.002648054453050863,Add neighbour crime,8,mps_property
+unemployment,-0.0023369809465543126,0.0011306684173915979,Add neighbour crime,8,mps_property
+W_mps_property,0.013278788513987207,0.011502372337334229,Add neighbour crime,8,mps_property
+log1p_mps_all,0.014466735364826002,0.006483805807819013,Add neighbour housing,8,mps_all
+detached_dum,0.5789781074404656,0.043473175722092826,Add neighbour housing,8,mps_all
+semi_d_dum,0.2936552343830959,0.04011210414378039,Add neighbour housing,8,mps_all
+terrace_dum,0.19242080703764966,0.03876838880948457,Add neighbour housing,8,mps_all
+freehold,0.3892106857387482,0.03872129787492732,Add neighbour housing,8,mps_all
+newbuild,0.217866192623224,0.016016585620524108,Add neighbour housing,8,mps_all
+tube_distnear_km,-0.003206437654771464,0.02848651778808557,Add neighbour housing,8,mps_all
+bus_distnear_km,0.13131197715093557,0.05389604279328092,Add neighbour housing,8,mps_all
+thamesriv_dist_km,-0.028274278114015783,0.028035930229800183,Add neighbour housing,8,mps_all
+grossannualpay_k,-0.006272720995134017,0.0010539483764228402,Add neighbour housing,8,mps_all
+hoursworked,-0.001167180142801548,0.0026474969103453855,Add neighbour housing,8,mps_all
+unemployment,-0.002328123355844272,0.001128400789967691,Add neighbour housing,8,mps_all
+W_mps_all,0.010893243626152668,0.014230715194699041,Add neighbour housing,8,mps_all
+W_detached_dum,-0.06424905827169397,0.0874772891607761,Add neighbour housing,8,mps_all
+W_semi_d_dum,0.023588926199822603,0.07896532176930036,Add neighbour housing,8,mps_all
+W_terrace_dum,-0.05767290820722966,0.07683159477239344,Add neighbour housing,8,mps_all
+W_freehold,-0.0027891100110991325,0.07589384436455986,Add neighbour housing,8,mps_all
+W_newbuild,0.006188198739242284,0.033140259501768445,Add neighbour housing,8,mps_all
+log1p_mps_violence,0.001073218114763768,0.003270629095398785,Add neighbour housing,8,mps_violence
+detached_dum,0.5789056931199272,0.043517223080133165,Add neighbour housing,8,mps_violence
+semi_d_dum,0.293985398498007,0.040146067131848547,Add neighbour housing,8,mps_violence
+terrace_dum,0.19237788465421413,0.038781393495735644,Add neighbour housing,8,mps_violence
+freehold,0.3888338976006768,0.038743720894694966,Add neighbour housing,8,mps_violence
+newbuild,0.2173024322164177,0.01603127827300396,Add neighbour housing,8,mps_violence
+tube_distnear_km,-0.004024192813011487,0.028490372972722243,Add neighbour housing,8,mps_violence
+bus_distnear_km,0.13094271768416021,0.05385725127056842,Add neighbour housing,8,mps_violence
+thamesriv_dist_km,-0.028352356508994595,0.028073658822265847,Add neighbour housing,8,mps_violence
+grossannualpay_k,-0.006255650836578015,0.001053066248778212,Add neighbour housing,8,mps_violence
+hoursworked,-0.0006954300477206781,0.002642902517064142,Add neighbour housing,8,mps_violence
+unemployment,-0.002274372968121591,0.0011287746536171822,Add neighbour housing,8,mps_violence
+W_mps_violence,-0.01111403255544189,0.008908101012030793,Add neighbour housing,8,mps_violence
+W_detached_dum,-0.06484968314057596,0.08774971812784965,Add neighbour housing,8,mps_violence
+W_semi_d_dum,0.02461762199078811,0.07931772707943892,Add neighbour housing,8,mps_violence
+W_terrace_dum,-0.05857239959257459,0.07717299116605777,Add neighbour housing,8,mps_violence
+W_freehold,-0.0027248220594700157,0.07621667658765854,Add neighbour housing,8,mps_violence
+W_newbuild,0.003548558586982849,0.033102553022449306,Add neighbour housing,8,mps_violence
+log1p_mps_property,0.01267030328632626,0.005480504705506407,Add neighbour housing,8,mps_property
+detached_dum,0.5787004038236984,0.04351709701166743,Add neighbour housing,8,mps_property
+semi_d_dum,0.2937770163479587,0.04017317628813503,Add neighbour housing,8,mps_property
+terrace_dum,0.1924332157068742,0.03882100111243187,Add neighbour housing,8,mps_property
+freehold,0.3889609074928186,0.03879385531315543,Add neighbour housing,8,mps_property
+newbuild,0.21774850079281965,0.016008715338559073,Add neighbour housing,8,mps_property
+tube_distnear_km,-0.0034161998806977703,0.028499993474592953,Add neighbour housing,8,mps_property
+bus_distnear_km,0.1302675164734386,0.05390574639269413,Add neighbour housing,8,mps_property
+thamesriv_dist_km,-0.028088255635154675,0.028031950924761316,Add neighbour housing,8,mps_property
+grossannualpay_k,-0.006321278265048789,0.0010531109044862746,Add neighbour housing,8,mps_property
+hoursworked,-0.0012318311984953255,0.0026524370577535594,Add neighbour housing,8,mps_property
+unemployment,-0.0023226261117343504,0.0011276733741526703,Add neighbour housing,8,mps_property
+W_mps_property,0.01443359726861823,0.011527181768056761,Add neighbour housing,8,mps_property
+W_detached_dum,-0.06365970617726761,0.08745990341468965,Add neighbour housing,8,mps_property
+W_semi_d_dum,0.026251950887064626,0.0789681758803094,Add neighbour housing,8,mps_property
+W_terrace_dum,-0.0554973134777303,0.07683052088791054,Add neighbour housing,8,mps_property
+W_freehold,-0.006903956454097348,0.07591212206462841,Add neighbour housing,8,mps_property
+W_newbuild,0.006280174771871044,0.03317971358572941,Add neighbour housing,8,mps_property
+log1p_mps_all,0.014075982033763014,0.00642744370802691,Housing + 4 neighbours,4,mps_all
+detached_dum,0.5801588638246352,0.0434430963242369,Housing + 4 neighbours,4,mps_all
+semi_d_dum,0.2940860210942211,0.040127072407427494,Housing + 4 neighbours,4,mps_all
+terrace_dum,0.19292734038756373,0.03878319374583024,Housing + 4 neighbours,4,mps_all
+freehold,0.3888422994625734,0.038738375400266416,Housing + 4 neighbours,4,mps_all
+newbuild,0.21799466776928902,0.01601185139231321,Housing + 4 neighbours,4,mps_all
+tube_distnear_km,-0.0035264409234531265,0.028476603746919852,Housing + 4 neighbours,4,mps_all
+bus_distnear_km,0.13237808317837438,0.053928731234449405,Housing + 4 neighbours,4,mps_all
+thamesriv_dist_km,-0.027495119190813034,0.028023389723570585,Housing + 4 neighbours,4,mps_all
+grossannualpay_k,-0.006253921300638257,0.001051952657054404,Housing + 4 neighbours,4,mps_all
+hoursworked,-0.0013268341966966946,0.002643076508424353,Housing + 4 neighbours,4,mps_all
+unemployment,-0.0023219666345024154,0.0011292561540884863,Housing + 4 neighbours,4,mps_all
+W_mps_all,0.012589114486370684,0.011237883893336275,Housing + 4 neighbours,4,mps_all
+W_detached_dum,-0.011940409084060433,0.06376588298245588,Housing + 4 neighbours,4,mps_all
+W_semi_d_dum,0.03970601633640144,0.05876613402946629,Housing + 4 neighbours,4,mps_all
+W_terrace_dum,-0.017006841428114174,0.05775832883619276,Housing + 4 neighbours,4,mps_all
+W_freehold,-0.027228879750107994,0.056487273417554586,Housing + 4 neighbours,4,mps_all
+W_newbuild,0.001391783738598196,0.024299751341884432,Housing + 4 neighbours,4,mps_all
+log1p_mps_violence,0.0009539305357840167,0.003269956233365226,Housing + 4 neighbours,4,mps_violence
+detached_dum,0.5799369837671923,0.0434610961899989,Housing + 4 neighbours,4,mps_violence
+semi_d_dum,0.2942347592354976,0.04012761629972657,Housing + 4 neighbours,4,mps_violence
+terrace_dum,0.1927820472551029,0.03876913046757833,Housing + 4 neighbours,4,mps_violence
+freehold,0.3886182940027359,0.038726091910906,Housing + 4 neighbours,4,mps_violence
+newbuild,0.2174819013898679,0.01602539115721036,Housing + 4 neighbours,4,mps_violence
+tube_distnear_km,-0.004144941268237292,0.02847775927174297,Housing + 4 neighbours,4,mps_violence
+bus_distnear_km,0.13198163074074637,0.053887646118830033,Housing + 4 neighbours,4,mps_violence
+thamesriv_dist_km,-0.027614808208336675,0.02806224197402495,Housing + 4 neighbours,4,mps_violence
+grossannualpay_k,-0.006269903282300699,0.0010515248834058596,Housing + 4 neighbours,4,mps_violence
+hoursworked,-0.0009824656237812292,0.002642386005329403,Housing + 4 neighbours,4,mps_violence
+unemployment,-0.002321521921199768,0.0011294864356737014,Housing + 4 neighbours,4,mps_violence
+W_mps_violence,-0.0018440286263646738,0.0064861435203061495,Housing + 4 neighbours,4,mps_violence
+W_detached_dum,-0.012173033377117455,0.06385974828016416,Housing + 4 neighbours,4,mps_violence
+W_semi_d_dum,0.03912190656036411,0.05892916524258808,Housing + 4 neighbours,4,mps_violence
+W_terrace_dum,-0.018327393316145597,0.057929366587714054,Housing + 4 neighbours,4,mps_violence
+W_freehold,-0.026253540035820516,0.05663271540014642,Housing + 4 neighbours,4,mps_violence
+W_newbuild,8.052822162634714e-05,0.0242807474769653,Housing + 4 neighbours,4,mps_violence
+log1p_mps_property,0.013016644971232578,0.005454854823071797,Housing + 4 neighbours,4,mps_property
+detached_dum,0.5799036410084807,0.04350982666072927,Housing + 4 neighbours,4,mps_property
+semi_d_dum,0.29410710256501754,0.04021249773661361,Housing + 4 neighbours,4,mps_property
+terrace_dum,0.1928003269320565,0.038858546749317074,Housing + 4 neighbours,4,mps_property
+freehold,0.388764377476001,0.03882919692900064,Housing + 4 neighbours,4,mps_property
+newbuild,0.21788144072198712,0.016003566313986375,Housing + 4 neighbours,4,mps_property
+tube_distnear_km,-0.003861297913591774,0.02848937720390307,Housing + 4 neighbours,4,mps_property
+bus_distnear_km,0.13134710212631306,0.053923125635592824,Housing + 4 neighbours,4,mps_property
+thamesriv_dist_km,-0.027236627433689063,0.02801798427563161,Housing + 4 neighbours,4,mps_property
+grossannualpay_k,-0.006298376881326045,0.0010513121223902676,Housing + 4 neighbours,4,mps_property
+hoursworked,-0.001335891814824496,0.0026467194218459658,Housing + 4 neighbours,4,mps_property
+unemployment,-0.002311203538804098,0.0011288473821998782,Housing + 4 neighbours,4,mps_property
+W_mps_property,0.010491120345851174,0.009281701177556901,Housing + 4 neighbours,4,mps_property
+W_detached_dum,-0.01184217820585134,0.06371773949965014,Housing + 4 neighbours,4,mps_property
+W_semi_d_dum,0.040444825104347173,0.058710168070336397,Housing + 4 neighbours,4,mps_property
+W_terrace_dum,-0.016455693718526187,0.057708175525756404,Housing + 4 neighbours,4,mps_property
+W_freehold,-0.028908602537072618,0.05642701213917036,Housing + 4 neighbours,4,mps_property
+W_newbuild,0.001185100061221873,0.024328831232381585,Housing + 4 neighbours,4,mps_property
+log1p_mps_all,0.013760937302015892,0.006489992397259314,Housing + 12 neighbours,12,mps_all
+detached_dum,0.5798355238141153,0.043534083477707715,Housing + 12 neighbours,12,mps_all
+semi_d_dum,0.29410059825466195,0.04015921362257237,Housing + 12 neighbours,12,mps_all
+terrace_dum,0.19309344857779562,0.03882520968034426,Housing + 12 neighbours,12,mps_all
+freehold,0.38797993938926506,0.038777741992922575,Housing + 12 neighbours,12,mps_all
+newbuild,0.21789767779361965,0.016021488373562216,Housing + 12 neighbours,12,mps_all
+tube_distnear_km,-0.002823955405775144,0.028489019715569098,Housing + 12 neighbours,12,mps_all
+bus_distnear_km,0.13103530532773175,0.05397636635037815,Housing + 12 neighbours,12,mps_all
+thamesriv_dist_km,-0.028362394726377062,0.028034829128785597,Housing + 12 neighbours,12,mps_all
+grossannualpay_k,-0.006236224579586264,0.001055447555755942,Housing + 12 neighbours,12,mps_all
+hoursworked,-0.0011567931651853271,0.0026489600100770144,Housing + 12 neighbours,12,mps_all
+unemployment,-0.0023506904126947754,0.0011278296635968616,Housing + 12 neighbours,12,mps_all
+W_mps_all,0.017967755355153023,0.01597987742466506,Housing + 12 neighbours,12,mps_all
+W_detached_dum,-0.13623966634754678,0.10719813227959561,Housing + 12 neighbours,12,mps_all
+W_semi_d_dum,-0.02398246789274579,0.0963467558496293,Housing + 12 neighbours,12,mps_all
+W_terrace_dum,-0.12915659545154798,0.09354554462901621,Housing + 12 neighbours,12,mps_all
+W_freehold,0.07070535725742874,0.09245989097678543,Housing + 12 neighbours,12,mps_all
+W_newbuild,0.007178118413463703,0.040662481899521444,Housing + 12 neighbours,12,mps_all
+log1p_mps_violence,0.0011597543111674649,0.003273820237375673,Housing + 12 neighbours,12,mps_violence
+detached_dum,0.5797841277446859,0.043596242135521164,Housing + 12 neighbours,12,mps_violence
+semi_d_dum,0.29478524303615056,0.04021964457264582,Housing + 12 neighbours,12,mps_violence
+terrace_dum,0.19328472450583514,0.03885913532929969,Housing + 12 neighbours,12,mps_violence
+freehold,0.3873930523925011,0.038824426331421635,Housing + 12 neighbours,12,mps_violence
+newbuild,0.21724836323050728,0.01603613776985884,Housing + 12 neighbours,12,mps_violence
+tube_distnear_km,-0.0037916460577545556,0.028490419026827748,Housing + 12 neighbours,12,mps_violence
+bus_distnear_km,0.1305112103426194,0.05393692510033606,Housing + 12 neighbours,12,mps_violence
+thamesriv_dist_km,-0.028273553067918938,0.02807664492153696,Housing + 12 neighbours,12,mps_violence
+grossannualpay_k,-0.0062068443355624454,0.0010551725428152108,Housing + 12 neighbours,12,mps_violence
+hoursworked,-0.0005235203500699678,0.0026432319713242643,Housing + 12 neighbours,12,mps_violence
+unemployment,-0.002270367904163558,0.0011280061538808037,Housing + 12 neighbours,12,mps_violence
+W_mps_violence,-0.015507135957914937,0.010555952400359558,Housing + 12 neighbours,12,mps_violence
+W_detached_dum,-0.13783415005980362,0.10762655825631587,Housing + 12 neighbours,12,mps_violence
+W_semi_d_dum,-0.019479670180358014,0.09688660112263461,Housing + 12 neighbours,12,mps_violence
+W_terrace_dum,-0.12766207570709198,0.09402770357558667,Housing + 12 neighbours,12,mps_violence
+W_freehold,0.06836623252860888,0.09293390648862243,Housing + 12 neighbours,12,mps_violence
+W_newbuild,0.0027291977703317086,0.0405848514880901,Housing + 12 neighbours,12,mps_violence
+log1p_mps_property,0.01214437192493616,0.005486940072448591,Housing + 12 neighbours,12,mps_property
+detached_dum,0.5795432352018306,0.043590964434085056,Housing + 12 neighbours,12,mps_property
+semi_d_dum,0.29426315251291174,0.040226999030198385,Housing + 12 neighbours,12,mps_property
+terrace_dum,0.19311202185688944,0.038884525496306624,Housing + 12 neighbours,12,mps_property
+freehold,0.3876743220425968,0.038856958669478386,Housing + 12 neighbours,12,mps_property
+newbuild,0.21777346639006323,0.01601323867654436,Housing + 12 neighbours,12,mps_property
+tube_distnear_km,-0.0029961239446477436,0.028501804831168286,Housing + 12 neighbours,12,mps_property
+bus_distnear_km,0.1301147609915978,0.05397515683793903,Housing + 12 neighbours,12,mps_property
+thamesriv_dist_km,-0.028165525836011243,0.028033299937841538,Housing + 12 neighbours,12,mps_property
+grossannualpay_k,-0.0062933726745675565,0.0010548364759899835,Housing + 12 neighbours,12,mps_property
+hoursworked,-0.0011972246325962577,0.002654157068218914,Housing + 12 neighbours,12,mps_property
+unemployment,-0.002341677397713503,0.001126870473207682,Housing + 12 neighbours,12,mps_property
+W_mps_property,0.019563819226001526,0.012913707058737726,Housing + 12 neighbours,12,mps_property
+W_detached_dum,-0.13678361400343125,0.10715396314020463,Housing + 12 neighbours,12,mps_property
+W_semi_d_dum,-0.02072231725425404,0.09632866227522784,Housing + 12 neighbours,12,mps_property
+W_terrace_dum,-0.12687157813885006,0.09352944071096325,Housing + 12 neighbours,12,mps_property
+W_freehold,0.06539005292780858,0.09247871130661389,Housing + 12 neighbours,12,mps_property
+W_newbuild,0.006854850787817983,0.04069224138713817,Housing + 12 neighbours,12,mps_property

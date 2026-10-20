@@ -1,5 +1,12 @@
 /.venv
 *.zip
 /codex
-/data
+/data/*
 /project_data
+
+# Keep data outputs, but exclude compressed raw/intermediate inputs.
+!/data/
+!/data/**/
+!/data/**/*
+/data/**/*.gz
+/data/**/*.npz
