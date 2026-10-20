@@ -35,6 +35,7 @@
     .positive { color:#136d4c; } .negative { color:#a33b22; } .muted { color:var(--muted); }
     .controls {display:block} #selectors {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0} button {padding:8px;cursor:pointer;margin:6px 0} .cards {display:none} .panel:has(#cards) {display:none} td small {display:block;color:var(--muted)} th {white-space:normal} td {max-width:320px;white-space:normal} summary {cursor:pointer;font-weight:600;margin-bottom:12px}
     .note { font-size:13px; color:var(--muted); }
+    .math-hat {position:relative;display:inline-block;line-height:1;padding-top:.12em;font-family:Georgia,'Times New Roman',serif;font-size:1.08em}.hat-accent {position:absolute;left:50%;top:-.38em;transform:translateX(-50%);font-size:.68em;line-height:1;font-family:Georgia,'Times New Roman',serif}
     .error { color:#a33b22; }
     .output-title {margin:0 0 6px;font-size:16px;line-height:1.4} .output-actions {display:flex;align-items:center;gap:14px;margin-top:10px} dialog::backdrop {background:rgba(15,23,42,.65)} #table-dialog {width:min(1200px,94vw);padding:20px} #table-dialog #preview {max-height:60vh;margin-top:16px} #table-dialog thead th {position:sticky;top:0} .dialog-heading {display:flex;align-items:center;justify-content:space-between;gap:16px}
     .full-model-button {display:block;width:100%;margin-top:5px;padding:4px;font-size:11px;white-space:nowrap}.copy-icon {display:inline-flex;align-items:center;justify-content:center;width:34px;height:32px;padding:5px!important}.copy-icon svg {width:18px;height:18px}.copy-icon.is-copied {color:#13734a;border-color:#13734a} #coeff-dialog {width:min(1200px,94vw);padding:18px} #coeff-dialog .table-wrap {max-height:70vh;overflow:auto;margin-top:12px} #coeff-dialog table {width:max-content;min-width:100%} #coeff-dialog thead th {position:sticky;top:0} #coeff-title {margin:0;font-size:18px}
@@ -52,13 +53,13 @@
   </section>
 
   <section id="compare" class="panel">
-    <h2>Compare up to five regressions</h2>
+    <h2>Compare regressions</h2>
     <div class="controls">
-      <p class="note">Choose a regression in each column header. Use + to add a column (up to five).</p>
+      <p class="note">Choose a regression in each column header. Use + to add another column.</p>
     </div>
     <div id="comparison" class="table-wrap"></div>
     <details><summary>How to interpret comparisons</summary><p id="context" class="note"></p></details>
-    <p class="note">A dash means unavailable. Results describe associations unless a valid causal design is established. “Clusters” in a full regression is the number of geographic groups used to calculate cluster-robust standard errors; clustering allows observations within a group to have correlated errors.</p>
+    <p class="note">Standard errors are clustered by LSOA for all main regressions, including the basic specifications. A dash means unavailable; results describe associations unless a valid causal design is established.</p>
   </section>
   <section id="iv-diagnostics" class="panel" hidden><h2>IV endogeneity checks</h2><p id="hausman-summary"></p><p class="note"><b>This is not a test of whether the instrument is valid.</b> The null is that residential burglary is exogenous conditional on controls and fixed effects. The primary result is the LSOA-clustered Wooldridge regression test. Rejection suggests an endogeneity concern only if the instrument is valid. Neither rejection nor non-rejection verifies the instrument’s exclusion restriction.</p><details><summary>All 15 Hausman tests</summary><div id="diagnostic-table" class="table-wrap"></div><p class="note">¹ Conventional Wu–Hausman assumes homoskedastic errors and omits absorbed-effect parameters from its denominator degrees of freedom. Use the clustered Wooldridge result as primary inference.</p></details><details><summary>First-stage, reduced-form and other IV diagnostics</summary><p class="note">These assess instrument relevance and report estimates. Relevance does not establish instrument validity.</p><div id="other-iv-diagnostics"></div></details></section>
 
@@ -73,7 +74,7 @@
 <dialog id="table-dialog" aria-labelledby="table-title"><div class="dialog-heading"><h2 id="table-title"></h2><button id="close-table">Close</button></div><div class="filters"><label>Search rows<input id="row-search" type="search"></label><label>Sort by<select id="sort"></select></label><button id="direction">Ascending</button></div><div id="preview" class="table-wrap" aria-live="polite"></div><button id="prev">Previous</button> <span id="page"></span> <button id="next">Next</button></dialog>
 <dialog id="coeff-dialog" aria-labelledby="coeff-title"><div class="dialog-heading"><h2 id="coeff-title"></h2><div><button id="copy-coeff" class="copy-icon" aria-label="Copy table" title="Copy table"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button><button id="close-coeff">Close</button></div></div><div id="coeff-content" class="table-wrap"></div></dialog>
 <dialog id="table-dialog" aria-labelledby="table-title"><div class="dialog-heading"><h2 id="table-title"></h2><button id="close-table">Close</button></div><div class="filters"><label>Search rows<input id="row-search" type="search"></label><label>Sort by<select id="sort"></select></label><button id="direction">Ascending</button></div><div id="preview" class="table-wrap" aria-live="polite"></div><button id="prev">Previous</button> <span id="page"></span> <button id="next">Next</button></dialog>
-<script src="explorer.js?v=canonical-exposure-stats"></script>
+<script src="explorer.js?v=unlimited-columns-lsoa-note"></script>
 
 </body>
 </html>
