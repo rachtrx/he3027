@@ -36,7 +36,7 @@
     .controls {display:block} #selectors {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0} button {padding:8px;cursor:pointer;margin:6px 0} .cards {display:none} .panel:has(#cards) {display:none} td small {display:block;color:var(--muted)} th {white-space:normal} td {max-width:320px;white-space:normal} summary {cursor:pointer;font-weight:600;margin-bottom:12px}
     .note { font-size:13px; color:var(--muted); }
     .math-hat {position:relative;display:inline-block;line-height:1;padding-top:.12em;font-family:Georgia,'Times New Roman',serif;font-size:1.08em}.hat-accent {position:absolute;left:50%;top:-.38em;transform:translateX(-50%);font-size:.68em;line-height:1;font-family:Georgia,'Times New Roman',serif}
-    #shortcuts {display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 14px}.shortcut-group {display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-right:10px}.shortcut-group-label {color:var(--muted);font-size:11px;font-weight:700}.quick-button {margin:0;padding:4px 7px;font-size:11px;line-height:1.2;border-radius:5px}.quick-button[aria-pressed="true"] {border-color:var(--blue);color:var(--blue);background:#eef6fc}
+    #shortcuts {display:block;margin:10px 0 14px}.shortcut-source {padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin:7px 0}.shortcut-source h3 {margin:0 0 6px;font-size:12px;color:var(--muted)}.shortcut-group {display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:4px 0}.shortcut-group-label {color:var(--muted);font-size:11px;font-weight:700;margin-right:3px}.quick-button {margin:0;padding:4px 7px;font-size:11px;line-height:1.2;border-radius:5px}.quick-button[aria-pressed="true"] {border-color:var(--blue);color:var(--blue);background:#eef6fc}
     .error { color:#a33b22; }
     .output-title {margin:0 0 6px;font-size:16px;line-height:1.4} .output-actions {display:flex;align-items:center;gap:14px;margin-top:10px} dialog::backdrop {background:rgba(15,23,42,.65)} #table-dialog {width:min(1200px,94vw);padding:20px} #table-dialog #preview {max-height:60vh;margin-top:16px} #table-dialog thead th {position:sticky;top:0} .dialog-heading {display:flex;align-items:center;justify-content:space-between;gap:16px}
     .full-model-button {display:block;width:100%;margin-top:5px;padding:4px;font-size:11px;white-space:nowrap}.copy-icon {display:inline-flex;align-items:center;justify-content:center;width:34px;height:32px;padding:5px!important}.copy-icon svg {width:18px;height:18px}.copy-icon.is-copied {color:#13734a;border-color:#13734a} #coeff-dialog {width:min(1200px,94vw);padding:18px} #coeff-dialog .table-wrap {max-height:70vh;overflow:auto;margin-top:12px} #coeff-dialog table {width:max-content;min-width:100%} #coeff-dialog thead th {position:sticky;top:0} #coeff-title {margin:0;font-size:18px}
@@ -56,7 +56,7 @@
   <section id="compare" class="panel">
     <h2>Compare regressions</h2>
     <div class="controls">
-      <p class="note">Choose a regression in each column header. Use + to add another column.</p>
+      <p class="note">Choose a regression in each column header. Use + to add another column. The URL updates with your selection, so you can share the comparison.</p>
     </div>
     <div id="shortcuts" aria-label="Regression shortcuts"></div>
     <div id="comparison" class="table-wrap"></div>
@@ -76,7 +76,7 @@
 <dialog id="table-dialog" aria-labelledby="table-title"><div class="dialog-heading"><h2 id="table-title"></h2><button id="close-table">Close</button></div><div class="filters"><label>Search rows<input id="row-search" type="search"></label><label>Sort by<select id="sort"></select></label><button id="direction">Ascending</button></div><div id="preview" class="table-wrap" aria-live="polite"></div><button id="prev">Previous</button> <span id="page"></span> <button id="next">Next</button></dialog>
 <dialog id="coeff-dialog" aria-labelledby="coeff-title"><div class="dialog-heading"><h2 id="coeff-title"></h2><div><button id="copy-coeff" class="copy-icon" aria-label="Copy table" title="Copy table"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button><button id="close-coeff">Close</button></div></div><div id="coeff-content" class="table-wrap"></div></dialog>
 <dialog id="table-dialog" aria-labelledby="table-title"><div class="dialog-heading"><h2 id="table-title"></h2><button id="close-table">Close</button></div><div class="filters"><label>Search rows<input id="row-search" type="search"></label><label>Sort by<select id="sort"></select></label><button id="direction">Ascending</button></div><div id="preview" class="table-wrap" aria-live="polite"></div><button id="prev">Previous</button> <span id="page"></span> <button id="next">Next</button></dialog>
-<script src="explorer.js?v=iv-needed-column"></script>
+<script src="explorer.js?v=shareable-comparisons"></script>
 
 </body>
 </html>

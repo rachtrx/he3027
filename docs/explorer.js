@@ -10,9 +10,19 @@ const hatSymbol=(letter,label)=>`<span class="math-hat" role="img" aria-label="$
 let catalog, pool=[], diagnostics=[], selected=[], activeCoeffIndex=0, loaded=null, page=0, sortKey=null, ascending=true, request=0;
 const timingOf=r=>r.exposure_label||r.crime_exposure||r.exposure||r.timing||null;
 const timingLabel=r=>{const t=timingOf(r);return ({lagyear:'Previous year','previous-year':'Previous year','current-year':'Annual',prior12:'Prior 12 months',annual:'Annual',none:'Not applicable'})[t]||t||'Not specified';};
-const sourceOf=r=>r.data_source||((String(r.crime||'').startsWith('mps_')||r._iv||/\bmps\b/i.test(r.source||''))?'MPS':r.model||r.specification?'Original Stata':r.source||'Source unspecified');
+const sourceOf=r=>{const source=r.data_source||((String(r.crime||'').startsWith('mps_')||r._iv||/\bmps\b/i.test(r.source||''))?'MPS':r.model||r.specification?'Original Stata':r.source||'Source unspecified');return /mps/i.test(source)?'MPS':/stata|original/i.test(source)?'Original Stata':source;};
 const crimeLabel=r=>({allcrime:'All crime',mps_all:'All crime',violent_crime:'Violence',mps_violence:'Violence',propertycrime:'Property crime',mps_property:'Property crime'})[r.crime]||r.crime||'Crime unspecified';
 const modelOrder=(a,b)=>Number(String(a.model||'').replace(/^M/i,''))-Number(String(b.model||'').replace(/^M/i,''));
+function decodeSharedSelection(){
+ if(!location.hash.startsWith('#compare='))return null;
+ try{const token=location.hash.slice(9).replace(/-/g,'+').replace(/_/g,'/');const binary=atob(token+'='.repeat((4-token.length%4)%4));const bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));const value=JSON.parse(new TextDecoder().decode(bytes));return Array.isArray(value)?value.filter(x=>typeof x==='string'):null;}catch{return null;}
+}
+function writeSharedSelection(){
+ if(!selected.length)return;
+ const bytes=new TextEncoder().encode(JSON.stringify(selected));let binary='';for(const byte of bytes)binary+=String.fromCharCode(byte);
+ const token=btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+ const hash=`#compare=${token}`;if(location.hash!==hash)history.replaceState(null,'',`${location.pathname}${location.search}${hash}`);
+}
 function rowLabel(r){
  const crime={allcrime:'All crime',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'Property-only benchmark'}[r.crime]||r.crime||(r._iv?'Residential burglary':'');
  const data=sourceOf(r);
@@ -49,7 +59,9 @@ function prepareComparisons(){
  const order=['Main regressions','IV and matched OLS/TWFE','Quantile regressions','Spatial regressions'];
  pool=[...unique.values()].sort((a,b)=>order.indexOf(a._family)-order.indexOf(b._family));
  renderShortcuts();
- selected=defaultPreset().map(r=>r.id);
+ const shared=decodeSharedSelection();
+ const validShared=shared?.filter(id=>pool.some(r=>r.id===id))||[];
+ selected=validShared.length?validShared:defaultPreset().map(r=>r.id);
  if(selected.length<2)selected.push(...pool.filter(r=>!selected.includes(r.id)).slice(0,2-selected.length).map(r=>r.id));
  renderCompare();
  const fields=['analysis','exposure','specification','method','beta','se','ci_low','ci_high','first_stage_wald_F','partial_R2','AR_95_set'];
@@ -62,8 +74,8 @@ function prepareComparisons(){
  const auxCols=['exposure','specification','method','beta','se','ci_low','ci_high','p','first_stage_wald_F','partial_R2','AR_95_set'];
  $('other-iv-diagnostics').innerHTML=auxiliary.length?table(auxCols.map(name),auxiliary.map(r=>auxCols.map(k=>cell(r[k],k)))):'No additional IV diagnostics found.';
 }
-function shortcutRows(predicate){
- const matches=pool.filter(r=>r._family==='Main regressions'&&!r._iv&&/^M[2-7]$/i.test(r.model||'')&&sourceOf(r)==='Original Stata'&&predicate(r));
+function shortcutRows(predicate,source='Original Stata'){
+ const matches=pool.filter(r=>r._family==='Main regressions'&&!r._iv&&/^M[2-7]$/i.test(r.model||'')&&sourceOf(r)===source&&predicate(r));
  const unique=new Map(matches.map(r=>[JSON.stringify([r.model,crimeLabel(r),timingLabel(r)]),r]));
  return [...unique.values()].sort(modelOrder);
 }
@@ -71,19 +83,21 @@ function defaultPreset(){
  return shortcutRows(r=>crimeLabel(r)==='All crime'&&timingLabel(r)==='Annual').filter(r=>/^M[2-7]$/i.test(r.model||''));
 }
 function renderShortcuts(){
- const base=pool.filter(r=>r._family==='Main regressions'&&!r._iv&&/^M[2-7]$/i.test(r.model||'')&&sourceOf(r)==='Original Stata');
- const combos=[...new Map(base.map(r=>{const key=JSON.stringify([crimeLabel(r),timingLabel(r)]);return[key,{crime:crimeLabel(r),timing:timingLabel(r)}]})).values()].sort((a,b)=>a.crime.localeCompare(b.crime)||a.timing.localeCompare(b.timing));
- const comboButtons=combos.map(c=>`<button class="quick-button" data-shortcut="combo" data-crime="${esc(c.crime)}" data-timing="${esc(c.timing)}">${esc(c.crime)} · ${esc(c.timing)}</button>`).join('');
- const models=[...new Set(base.map(r=>r.model))].sort((a,b)=>Number(a.slice(1))-Number(b.slice(1)));
- const modelButtons=models.map(m=>`<button class="quick-button" data-shortcut="same-model" data-model="${esc(m)}">${esc(m)}</button>`).join('');
- const defaults=defaultPreset();
- $('shortcuts').innerHTML=`<div class="shortcut-group"><span class="shortcut-group-label">Sequence:</span><button class="quick-button" data-shortcut="default" ${defaults.length?'':'disabled'}>M2–M7 · All crime · Original Stata · Annual</button></div><div class="shortcut-group"><span class="shortcut-group-label">M2–M7 by crime × exposure:</span>${comboButtons}</div><div class="shortcut-group"><span class="shortcut-group-label">Compare variants of:</span>${modelButtons}</div>`;
+ const sourceGroup=source=>{
+  const base=pool.filter(r=>r._family==='Main regressions'&&!r._iv&&/^M[2-7]$/i.test(r.model||'')&&sourceOf(r)===source);
+  const combos=[...new Map(base.map(r=>{const key=JSON.stringify([crimeLabel(r),timingLabel(r)]);return[key,{crime:crimeLabel(r),timing:timingLabel(r)}]})).values()].sort((a,b)=>a.crime.localeCompare(b.crime)||a.timing.localeCompare(b.timing));
+  const comboButtons=combos.map(c=>`<button class="quick-button" data-shortcut="combo" data-source="${esc(source)}" data-crime="${esc(c.crime)}" data-timing="${esc(c.timing)}">${esc(c.crime)} · ${esc(c.timing)}</button>`).join('');
+  const models=[...new Set(base.map(r=>r.model))].sort((a,b)=>Number(a.slice(1))-Number(b.slice(1)));
+  const modelButtons=models.map(m=>`<button class="quick-button" data-shortcut="same-model" data-source="${esc(source)}" data-model="${esc(m)}">${esc(m)}</button>`).join('');
+  return `<div class="shortcut-source"><h3>${esc(source)}</h3><div class="shortcut-group"><span class="shortcut-group-label">M2–M7 by crime × exposure:</span>${comboButtons||'<span class="note">No matching runs</span>'}</div><div class="shortcut-group"><span class="shortcut-group-label">Compare variants of:</span>${modelButtons||'<span class="note">No matching runs</span>'}</div></div>`;
+ };
+ $('shortcuts').innerHTML=sourceGroup('Original Stata')+sourceGroup('MPS');
 }
 function applyShortcut(button){
  let rows=[];
- if(button.dataset.shortcut==='default')rows=defaultPreset();
- else if(button.dataset.shortcut==='combo')rows=shortcutRows(r=>crimeLabel(r)===button.dataset.crime&&timingLabel(r)===button.dataset.timing);
- else if(button.dataset.shortcut==='same-model')rows=shortcutRows(r=>r.model===button.dataset.model);
+ const source=button.dataset.source;
+ if(button.dataset.shortcut==='combo')rows=shortcutRows(r=>crimeLabel(r)===button.dataset.crime&&timingLabel(r)===button.dataset.timing,source);
+ else if(button.dataset.shortcut==='same-model')rows=shortcutRows(r=>r.model===button.dataset.model,source);
  if(!rows.length)return;
  selected=rows.map(r=>r.id);
  renderCompare();
@@ -93,7 +107,9 @@ function renderCompare(){
  if(!rows.length){$('comparison').textContent='No matching regressions.';return;}
  selected=selected.filter(id=>rows.some(r=>r.id===id));
  while(selected.length<Math.min(2,rows.length))selected.push(rows.find(r=>!selected.includes(r.id)).id);
- const headers=selected.map((id,i)=>`<th class="column-head" scope="col"><div class="column-control"><select id="r${i}" aria-label="Regression for column ${i+1}" title="${esc(rowLabel(rows.find(r=>r.id===id)))}" data-select="${i}">${[...new Set(rows.map(r=>r._family))].map(group=>`<optgroup label="${esc(group)}">${rows.filter(r=>r._family===group).map(r=>`<option value="${esc(r.id)}" ${r.id===id?'selected':''}>${esc(rowLabel(r))}</option>`).join('')}</optgroup>`).join('')}</select><button class="column-remove" data-remove="${i}" aria-label="Remove comparison ${i+1}" title="Remove column" ${selected.length<=2?'disabled':''}>×</button></div><button class="full-model-button" data-open-coeff="${i}">Full regression</button></th>`).join('');
+ const dropdownGroup=r=>r._family==='Main regressions'?`Main regressions · ${sourceOf(r)}`:r._family;
+ const groups=[...new Set(rows.map(dropdownGroup))];
+ const headers=selected.map((id,i)=>`<th class="column-head" scope="col"><div class="column-control"><select id="r${i}" aria-label="Regression for column ${i+1}" title="${esc(rowLabel(rows.find(r=>r.id===id)))}" data-select="${i}">${groups.map(group=>`<optgroup label="${esc(group)}">${rows.filter(r=>dropdownGroup(r)===group).map(r=>`<option value="${esc(r.id)}" ${r.id===id?'selected':''}>${esc(rowLabel(r))}</option>`).join('')}</optgroup>`).join('')}</select><button class="column-remove" data-remove="${i}" aria-label="Remove comparison ${i+1}" title="Remove column" ${selected.length<=2?'disabled':''}>×</button></div><button class="full-model-button" data-open-coeff="${i}">Full regression</button></th>`).join('');
  const atLimit=selected.length>=rows.length;
  const chosen=selected.map(id=>rows.find(r=>r.id===id));
  const fields=['model','crime','canonical_exposure','beta','se','p','ci_low','ci_high','N','r2'].filter(k=>k!=='r2'||chosen.some(r=>r.r2!=null));
@@ -114,6 +130,7 @@ function renderCompare(){
  const scroll=$('comparison').scrollLeft;
  $('comparison').innerHTML=`<table style="--comparison-count:${selected.length}"><thead><tr><th scope="col">Statistic</th>${headers}<th class="add-column" scope="col"><button data-add="true" aria-label="Add comparison column" title="${atLimit?'No more regressions to add':'Add comparison'}" ${atLimit?'disabled':''}>+</button></th></tr></thead><tbody>${fields.map(k=>`<tr><th scope="row">${labels[k]}</th>${chosen.map(r=>`<td>${shown(r,k)}</td>`).join('')}<td class="add-column"></td></tr>`).join('')}</tbody></table>`;
  $('comparison').scrollLeft=scroll;
+ writeSharedSelection();
  if($('coeff-dialog').open)renderFullCoefficients(activeCoeffIndex);
  $('context').textContent='Cross-analysis comparisons are descriptive: IV targets residential burglary, quantiles target conditional price percentiles, and spatial models may use area-year observations. Check the crime definition, sample, timing and fixed effects in each column. M1 has no crime coefficient.';
 }
