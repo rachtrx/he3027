@@ -54,7 +54,7 @@ function renderCompare(){
  const preferred=['model','method','data_source','crime','exposure_label','exposure','quantile','specification','k','beta','se','bootstrap_se','ci_low','ci_high','p','N','clusters','first_stage_wald_F','partial_R2','AR_95_set','bootstrap_success','fixed_effects','r2','r2_type'];
  const fields=[...new Set([...preferred,...chosen.flatMap(Object.keys)])].filter(k=>!k.startsWith('_')&&!['id','source','output','analysis','panel'].includes(k)&&chosen.some(r=>r[k]!=null));
  const scroll=$('comparison').scrollLeft;
- $('comparison').innerHTML=`<table><thead><tr><th scope="col">Statistic</th>${headers}<th class="add-column" scope="col"><button data-add="true" aria-label="Add comparison column" title="${atLimit?'Comparison limit reached':'Add comparison'}" ${atLimit?'disabled':''}>+</button></th></tr></thead><tbody>${fields.map(k=>`<tr><th scope="row">${esc(name(k))}</th>${chosen.map(r=>`<td>${cell(r[k],k)}</td>`).join('')}<td class="add-column"></td></tr>`).join('')}</tbody></table>`;
+ $('comparison').innerHTML=`<table style="--comparison-count:${selected.length}"><thead><tr><th scope="col">Statistic</th>${headers}<th class="add-column" scope="col"><button data-add="true" aria-label="Add comparison column" title="${atLimit?'Comparison limit reached':'Add comparison'}" ${atLimit?'disabled':''}>+</button></th></tr></thead><tbody>${fields.map(k=>`<tr><th scope="row">${esc(name(k))}</th>${chosen.map(r=>`<td>${cell(r[k],k)}</td>`).join('')}<td class="add-column"></td></tr>`).join('')}</tbody></table>`;
  $('comparison').scrollLeft=scroll;
  $('full-regressions').innerHTML=chosen.map((r,i)=>{
   const coeff=r.coefficients||[];
