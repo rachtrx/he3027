@@ -11,6 +11,8 @@ let catalog, pool=[], diagnostics=[], selected=[], activeCoeffIndex=0, loaded=nu
 const timingOf=r=>r.exposure_label||r.crime_exposure||r.exposure||r.timing||null;
 const timingLabel=r=>{const t=timingOf(r);return ({lagyear:'Previous year','previous-year':'Previous year','current-year':'Annual',prior12:'Prior 12 months',annual:'Annual',none:'Not applicable'})[t]||t||'Not specified';};
 const sourceOf=r=>r.data_source||((String(r.crime||'').startsWith('mps_')||r._iv||/\bmps\b/i.test(r.source||''))?'MPS':r.model||r.specification?'Original Stata':r.source||'Source unspecified');
+const crimeLabel=r=>({allcrime:'All crime',mps_all:'All crime',violent_crime:'Violence',mps_violence:'Violence',propertycrime:'Property crime',mps_property:'Property crime'})[r.crime]||r.crime||'Crime unspecified';
+const modelOrder=(a,b)=>Number(String(a.model||'').replace(/^M/i,''))-Number(String(b.model||'').replace(/^M/i,''));
 function rowLabel(r){
  const crime={allcrime:'All crime',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'Property-only benchmark'}[r.crime]||r.crime||(r._iv?'Residential burglary':'');
  const data=sourceOf(r);
@@ -25,12 +27,11 @@ function renderFullCoefficients(index){
  const coeff=r.coefficients||[];
  $('coeff-title').textContent=`${rowLabel(r)} · Full regression`;
  $('copy-coeff').dataset.copyCoeff=String(index);
- const stats=[['Observations (N)',fmt(r.N)],['R²',fmt(r.r2)],['Clusters',fmt(r.clusters)]];
- const statsTable=table(['Model statistic','Value'],stats.map(([k,v])=>[esc(k),v]));
- if(!coeff.length){$('coeff-content').innerHTML=`${statsTable}<p class="note">No matching full coefficient export was found for this result.</p>`;return;}
+ const statsText=`N = ${fmt(r.N)} · R² = ${fmt(r.r2)} · Clusters = ${fmt(r.clusters)}`;
+ if(!coeff.length){$('coeff-content').innerHTML=`<p class="note">${statsText}</p><p class="note">No matching full coefficient export was found for this result.</p>`;return;}
  const cols=['variable','beta','se','t','p','ci_low','ci_high'].filter(k=>r.coefficient_columns?.includes(k));
  const headings={variable:'Variable',beta:'Coefficient',se:'Standard error',t:'t statistic',p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper'};
- $('coeff-content').innerHTML=`${statsTable}${table(cols.map(k=>headings[k]||name(k)),coeff.map(c=>cols.map(k=>k==='variable'?esc(c[k]):fmt(c[k],k))))}`;
+ $('coeff-content').innerHTML=`<p class="note">${statsText}</p>${table(cols.map(k=>headings[k]||name(k)),coeff.map(c=>cols.map(k=>k==='variable'?esc(c[k]):fmt(c[k],k))))}`;
 }
 const options=()=>pool;
 function prepareComparisons(){
@@ -47,7 +48,9 @@ function prepareComparisons(){
  }
  const order=['Main regressions','IV and matched OLS/TWFE','Quantile regressions','Spatial regressions'];
  pool=[...unique.values()].sort((a,b)=>order.indexOf(a._family)-order.indexOf(b._family));
- const defaults=pool.filter(r=>r.model==='M2');selected=defaults.slice(0,2).map(r=>r.id);
+ renderShortcuts();
+ selected=defaultPreset().map(r=>r.id);
+ if(selected.length<2)selected.push(...pool.filter(r=>!selected.includes(r.id)).slice(0,2-selected.length).map(r=>r.id));
  renderCompare();
  const fields=['analysis','exposure','specification','method','beta','se','ci_low','ci_high','first_stage_wald_F','partial_R2','AR_95_set'];
  $('diagnostic-table').innerHTML=diagnostics.length?table(fields.map(name),diagnostics.map(r=>fields.map(k=>cell(r[k],k)))):'No IV diagnostics available.';
@@ -58,6 +61,32 @@ function prepareComparisons(){
  const auxiliary=catalog.families.flatMap(f=>f.rows).filter(r=>r.first_stage_wald_F!=null||['First stage','Reduced form'].includes(r.method));
  const auxCols=['exposure','specification','method','beta','se','ci_low','ci_high','p','first_stage_wald_F','partial_R2','AR_95_set'];
  $('other-iv-diagnostics').innerHTML=auxiliary.length?table(auxCols.map(name),auxiliary.map(r=>auxCols.map(k=>cell(r[k],k)))):'No additional IV diagnostics found.';
+}
+function shortcutRows(predicate){
+ const matches=pool.filter(r=>r._family==='Main regressions'&&!r._iv&&/^M[2-7]$/i.test(r.model||'')&&sourceOf(r)==='Original Stata'&&predicate(r));
+ const unique=new Map(matches.map(r=>[JSON.stringify([r.model,crimeLabel(r),timingLabel(r)]),r]));
+ return [...unique.values()].sort(modelOrder);
+}
+function defaultPreset(){
+ return shortcutRows(r=>crimeLabel(r)==='All crime'&&timingLabel(r)==='Annual').filter(r=>/^M[2-7]$/i.test(r.model||''));
+}
+function renderShortcuts(){
+ const base=pool.filter(r=>r._family==='Main regressions'&&!r._iv&&/^M[2-7]$/i.test(r.model||'')&&sourceOf(r)==='Original Stata');
+ const combos=[...new Map(base.map(r=>{const key=JSON.stringify([crimeLabel(r),timingLabel(r)]);return[key,{crime:crimeLabel(r),timing:timingLabel(r)}]})).values()].sort((a,b)=>a.crime.localeCompare(b.crime)||a.timing.localeCompare(b.timing));
+ const comboButtons=combos.map(c=>`<button class="quick-button" data-shortcut="combo" data-crime="${esc(c.crime)}" data-timing="${esc(c.timing)}">${esc(c.crime)} · ${esc(c.timing)}</button>`).join('');
+ const models=[...new Set(base.map(r=>r.model))].sort((a,b)=>Number(a.slice(1))-Number(b.slice(1)));
+ const modelButtons=models.map(m=>`<button class="quick-button" data-shortcut="same-model" data-model="${esc(m)}">${esc(m)}</button>`).join('');
+ const defaults=defaultPreset();
+ $('shortcuts').innerHTML=`<div class="shortcut-group"><span class="shortcut-group-label">Sequence:</span><button class="quick-button" data-shortcut="default" ${defaults.length?'':'disabled'}>M2–M7 · All crime · Original Stata · Annual</button></div><div class="shortcut-group"><span class="shortcut-group-label">M2–M7 by crime × exposure:</span>${comboButtons}</div><div class="shortcut-group"><span class="shortcut-group-label">Compare variants of:</span>${modelButtons}</div>`;
+}
+function applyShortcut(button){
+ let rows=[];
+ if(button.dataset.shortcut==='default')rows=defaultPreset();
+ else if(button.dataset.shortcut==='combo')rows=shortcutRows(r=>crimeLabel(r)===button.dataset.crime&&timingLabel(r)===button.dataset.timing);
+ else if(button.dataset.shortcut==='same-model')rows=shortcutRows(r=>r.model===button.dataset.model);
+ if(!rows.length)return;
+ selected=rows.map(r=>r.id);
+ renderCompare();
 }
 function renderCompare(){
  const rows=options();$('iv-diagnostics').hidden=!(catalog.diagnostics||[]).length;
@@ -106,6 +135,7 @@ function renderTable(){
 }
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.shortcut){applyShortcut(b);return;}
  if(b.dataset.remove!=null&&selected.length>2){const index=+b.dataset.remove;selected.splice(index,1);renderCompare();document.getElementById(`r${Math.min(index,selected.length-1)}`)?.focus();}
  if(b.dataset.add){const next=options().find(r=>!selected.includes(r.id));if(next){selected.push(next.id);renderCompare();document.getElementById(`r${selected.length-1}`)?.focus();}}
  if(b.dataset.openCoeff!=null){renderFullCoefficients(+b.dataset.openCoeff);$('coeff-dialog').showModal();}
@@ -113,9 +143,9 @@ document.addEventListener('click',async e=>{
   const cols=['variable','beta','se','t','p','ci_low','ci_high'].filter(k=>r.coefficient_columns?.includes(k));
   const heading={variable:'Variable',beta:'Coefficient',se:'Standard error',t:'t statistic',p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper'};
   const safe=x=>esc(x==null?'':x);
-  const stats=[['Observations (N)',fmt(r.N)],['R²',fmt(r.r2)],['Clusters',fmt(r.clusters)]];
-  const html=`<table border="1" style="border-collapse:collapse"><caption>${safe(rowLabel(r))} · Model statistics</caption><tbody>${stats.map(([k,v])=>`<tr><th>${safe(k)}</th><td>${safe(v)}</td></tr>`).join('')}</tbody></table><br><table border="1" style="border-collapse:collapse"><caption>${safe(rowLabel(r))} · Full regression</caption><thead><tr>${cols.map(k=>`<th>${safe(heading[k]||name(k))}</th>`).join('')}</tr></thead><tbody>${(r.coefficients||[]).map(row=>`<tr>${cols.map(k=>`<td>${safe(k==='variable'?row[k]:fmt(row[k],k))}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
-  const plain=[['Model statistic','Value'],...stats,...[[''],cols.map(k=>heading[k]||name(k)),...(r.coefficients||[]).map(row=>cols.map(k=>row[k]??''))]].map(line=>Array.isArray(line)?line.join('\t'):line).join('\n');
+  const statsText=`N = ${fmt(r.N)} · R² = ${fmt(r.r2)} · Clusters = ${fmt(r.clusters)}`;
+  const html=`<p>${safe(statsText)}</p><table border="1" style="border-collapse:collapse"><caption>${safe(rowLabel(r))} · Full regression</caption><thead><tr>${cols.map(k=>`<th>${safe(heading[k]||name(k))}</th>`).join('')}</tr></thead><tbody>${(r.coefficients||[]).map(row=>`<tr>${cols.map(k=>`<td>${safe(k==='variable'?row[k]:fmt(row[k],k))}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  const plain=[statsText,cols.map(k=>heading[k]||name(k)).join('\t'),...(r.coefficients||[]).map(row=>cols.map(k=>row[k]??'').join('\t'))].join('\n');
   try{
    if(navigator.clipboard?.write&&window.ClipboardItem){
     await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);
