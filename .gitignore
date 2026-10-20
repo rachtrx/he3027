@@ -1,0 +1,5 @@
+/.venv
+*.zip
+/codex
+/data
+/project_data
