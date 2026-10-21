@@ -113,9 +113,9 @@ function renderCompare(){
  const headers=selected.map((id,i)=>`<th class="column-head" scope="col"><div class="column-control"><select id="r${i}" aria-label="Regression for column ${i+1}" title="${esc(rowLabel(rows.find(r=>r.id===id)))}" data-select="${i}">${groups.map(group=>`<optgroup label="${esc(group)}">${rows.filter(r=>dropdownGroup(r)===group).map(r=>`<option value="${esc(r.id)}" ${r.id===id?'selected':''}>${esc(rowLabel(r))}</option>`).join('')}</optgroup>`).join('')}</select><button class="column-remove" data-remove="${i}" aria-label="Remove comparison ${i+1}" title="Remove column" ${selected.length<=2?'disabled':''}>×</button></div><button class="full-model-button" data-open-coeff="${i}">Full regression</button></th>`).join('');
  const atLimit=selected.length>=rows.length;
  const chosen=selected.map(id=>rows.find(r=>r.id===id));
- const fields=['model','crime','canonical_exposure','beta','se','p','ci_low','ci_high','N','r2'].filter(k=>k!=='r2'||chosen.some(r=>r.r2!=null));
  const isInteraction=chosen.some(r=>r._family==='Interaction regressions');
- const labels={model:'Model / estimator',crime:'Crime measure',canonical_exposure:'Crime data · exposure',beta:isInteraction?'Crime × borough income coefficient':hatSymbol('β','beta hat'),se:isInteraction?'Interaction standard error':`SE(${hatSymbol('β','beta hat')})`,p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper',N:'N',r2:'R²'};
+ const fields=['model','crime','canonical_exposure',...(isInteraction?['crime_main_beta']:[]),'beta','se','p','ci_low','ci_high','N','r2'].filter(k=>k!=='r2'||chosen.some(r=>r.r2!=null));
+ const labels={model:'Model / estimator',crime:'Crime measure',canonical_exposure:'Crime data · exposure',crime_main_beta:'Crime β at mean borough income (04)',beta:isInteraction?'Reported β (04: crime × income)':hatSymbol('β','beta hat'),se:isInteraction?'Reported β standard error':`SE(${hatSymbol('β','beta hat')})`,p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper',N:'N',r2:'R²'};
  const shown=(r,k)=>{
   if(k==='crime')return ({allcrime:'All crime',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'None (benchmark)'})[r[k]]||r[k]||'—';
   if(k==='model'){
@@ -126,6 +126,11 @@ function renderCompare(){
   if(k==='canonical_exposure'){
    const timing=timingLabel(r);
    return `${sourceOf(r)} · ${timing}`;
+  }
+  if(k==='crime_main_beta'){
+   if(r._family!=='Interaction regressions')return '—';
+   const main=(r.coefficients||[]).find(c=>c.variable===`crime_${r.crime}_c`);
+   return fmt(main?.beta);
   }
   return fmt(r[k],k);
  };
