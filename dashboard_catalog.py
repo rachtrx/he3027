@@ -56,6 +56,14 @@ def build():
                     reader = csv.DictReader(handle)
                     columns = [c for c in (reader.fieldnames or []) if c and not c.startswith('Unnamed:')]
                     rows = [{c: value(r.get(c)) for c in columns} for r in reader]
+                if path.stem == 'interaction_regressions':
+                    aliases = {'beta': 'interaction_beta', 'se': 'interaction_se'}
+                    for row in rows:
+                        row.update({k: row.get(v) for k, v in aliases.items()})
+                        row.setdefault('method', 'Crime × borough income')
+                        row.setdefault('data_source', 'MPS')
+                        row.setdefault('exposure', 'prior12')
+                    columns = list(dict.fromkeys(columns + list(aliases) + ['method', 'data_source', 'exposure']))
                 json_target = target.with_suffix('.json')
                 json_target.write_text(json.dumps(dict(columns=columns, rows=rows), allow_nan=False), encoding='utf-8')
                 item.update(columns=columns, rows=len(rows), json=url[:-4]+'.json')

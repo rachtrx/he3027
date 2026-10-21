@@ -51,12 +51,13 @@ function prepareComparisons(){
   for(const row of family.rows){
    if(iv&&!['2SLS','OLS','TWFE'].includes(row.method)){diagnostics.push({...row,analysis:family.label});continue;}
    const identity=JSON.stringify([family.id==='main'?'main':family.id.split('/')[0],...['model','panel','specification','method','crime','quantile','k','N','beta'].map(k=>row[k]??null),timingOf(row)]);
-   const candidate={...row,id:identity,_iv:iv,_family:family.id==='main'?'Main regressions':iv?'IV and matched OLS/TWFE':row.quantile!=null?'Quantile regressions':'Spatial regressions',analysis:family.label};
+   const interaction=String(row.method||'').startsWith('Crime ×')||row.interaction_beta!=null;
+   const candidate={...row,id:identity,_iv:iv,_family:family.id==='main'?'Main regressions':interaction?'Interaction regressions':iv?'IV and matched OLS/TWFE':row.quantile!=null?'Quantile regressions':'Spatial regressions',analysis:family.label};
    const previous=unique.get(identity);
    if(!previous||Object.keys(row).length>Object.keys(previous).length-4)unique.set(identity,candidate);
   }
  }
- const order=['Main regressions','IV and matched OLS/TWFE','Quantile regressions','Spatial regressions'];
+ const order=['Main regressions','Interaction regressions','IV and matched OLS/TWFE','Quantile regressions','Spatial regressions'];
  pool=[...unique.values()].sort((a,b)=>order.indexOf(a._family)-order.indexOf(b._family));
  renderShortcuts();
  const shared=decodeSharedSelection();
@@ -113,7 +114,8 @@ function renderCompare(){
  const atLimit=selected.length>=rows.length;
  const chosen=selected.map(id=>rows.find(r=>r.id===id));
  const fields=['model','crime','canonical_exposure','beta','se','p','ci_low','ci_high','N','r2'].filter(k=>k!=='r2'||chosen.some(r=>r.r2!=null));
- const labels={model:'Model / estimator',crime:'Crime measure',canonical_exposure:'Crime data · exposure',beta:hatSymbol('β','beta hat'),se:`SE(${hatSymbol('β','beta hat')})`,p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper',N:'N',r2:'R²'};
+ const isInteraction=chosen.some(r=>r._family==='Interaction regressions');
+ const labels={model:'Model / estimator',crime:'Crime measure',canonical_exposure:'Crime data · exposure',beta:isInteraction?'Crime × borough income coefficient':hatSymbol('β','beta hat'),se:isInteraction?'Interaction standard error':`SE(${hatSymbol('β','beta hat')})`,p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper',N:'N',r2:'R²'};
  const shown=(r,k)=>{
   if(k==='crime')return ({allcrime:'All crime',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'None (benchmark)'})[r[k]]||r[k]||'—';
   if(k==='model'){
@@ -132,7 +134,7 @@ function renderCompare(){
  $('comparison').scrollLeft=scroll;
  writeSharedSelection();
  if($('coeff-dialog').open)renderFullCoefficients(activeCoeffIndex);
- $('context').textContent='Cross-analysis comparisons are descriptive: IV targets residential burglary, quantiles target conditional price percentiles, and spatial models may use area-year observations. Check the crime definition, sample, timing and fixed effects in each column. M1 has no crime coefficient.';
+ $('context').textContent='Cross-analysis comparisons are descriptive: IV targets residential burglary, quantiles target conditional price percentiles, spatial SLX uses individual sales, and Moran statistics use LSOA-year summaries. Check the crime definition, sample, timing and fixed effects in each column. M1 has no crime coefficient.';
 }
 function matches(item){return(!$('group').value||item.group===$('group').value)&&(`${item.title} ${item.group}`.toLowerCase().includes($('search').value.toLowerCase()));}
 function browse(){

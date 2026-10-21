@@ -92,10 +92,10 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     extensions = []
     for title, folder, filename, columns, note in [
-        ('04 · Instrumental variables', '04_crime_iv_outputs', 'all_iv_regressions.csv', [], 'Residential burglary instrumented with business/community burglary. A strong first stage does not establish instrument validity. No causal conclusion is justified by the sign alone.'),
-        ('05 · Price quantiles', '05_crime_quantile_outputs', 'quantile_results.csv', ['crime', 'quantile', 'beta', 'ci_low', 'ci_high', 'N', 'bootstrap_success'], 'All-crime estimates range from negative at the 5th conditional price percentile to positive at the 95th in the current export. This pilot uses 6,000 observations and 39 successful bootstrap draws per estimate. Conditional quantiles are not fixed groups of homes.'),
-        ('06 · Neighbourhood effects', '06_crime_spatial_outputs', 'spatial_regressions.csv', ['specification', 'k', 'crime', 'beta', 'se', 'ci_low', 'ci_high', 'N'], 'The reported beta is own-area crime, even when neighbour controls are added. k is the number of neighbours. These are area-year regressions with LSOA and year effects, not transaction-level M1–M7 estimates.'),
-        ('06 · Spatial clustering', '06_crime_spatial_outputs', 'moran_diagnostics.csv', ['k', 'year', 'variable', 'moran_I', 'permutation_p', 'permutations'], "Positive Moran’s I indicates similar values in nearby areas. Residual clustering can remain after regression controls; this diagnostic is not a causal effect."),
+        ('05 · Instrumental variables', '05_crime_iv_outputs', 'all_iv_regressions.csv', [], 'Residential burglary instrumented with business/community burglary. A strong first stage does not establish instrument validity.'),
+        ('06 · Price quantiles', '06_crime_quantile_outputs', 'quantile_points.csv', ['crime', 'quantile', 'beta', 'ci_low', 'ci_high', 'N'], 'Conditional quantile estimates use a reproducible sample and clustered bootstrap intervals.'),
+        ('07 · Neighbourhood effects', '07_crime_spatial_outputs', 'spatial_regressions.csv', ['specification', 'k', 'crime', 'beta', 'se', 'ci_low', 'ci_high', 'N'], 'Transaction-level regressions use sale-month prior12 own and neighbouring crime, LSOA and year-quarter effects. The reported beta is own-area crime.'),
+        ('07 · Spatial clustering', '07_crime_spatial_outputs', 'moran_diagnostics.csv', ['k', 'year', 'variable', 'moran_I', 'permutation_p', 'permutations'], "Area-year Moran diagnostics describe spatial clustering; they are not causal effects."),
     ]:
         path = DATA / folder / filename
         rows = [{k: number(v) for k, v in row.items() if k and k != 'Unnamed: 0'} for row in read_csv(path)] if path.exists() else []

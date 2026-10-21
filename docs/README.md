@@ -1,6 +1,6 @@
 # Regression comparison dashboard
 
-Each of up to five comparison columns selects independently using its header dropdown. Options are grouped in this order: main regressions, IV and matched OLS/TWFE, quantiles, spatial regressions. All are always available. First-stage, reduced-form and IV diagnostic summaries remain in a separate expandable section. Each build versions the JavaScript URL to prevent outdated cached scripts from breaking the updated page.
+Each of up to five comparison columns selects independently using its header dropdown. Options are grouped in this order: main regressions, interaction regressions, IV and matched OLS/TWFE, quantiles, spatial regressions. Notebook 04's interaction uses prior-12-month MPS crime. Notebook 07's SLX uses individual sales and sale-month prior-12-month own and neighbouring crime; its Moran diagnostics aggregate to LSOA-year. First-stage, reduced-form and IV diagnostic summaries remain in a separate expandable section. Each build versions the JavaScript URL to prevent outdated cached scripts from breaking the updated page.
 
 ## Automatic discovery
 

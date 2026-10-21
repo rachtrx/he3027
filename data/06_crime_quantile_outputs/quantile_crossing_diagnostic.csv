@@ -1,0 +1,4 @@
+,crime,analysed_sales,crossing_count,quantile_crossing_share
+0,mps_all,6000,2,0.0003333333333333333
+1,mps_violence,6000,0,0.0
+2,mps_property,6000,1,0.00016666666666666666
