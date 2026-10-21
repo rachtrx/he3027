@@ -11,7 +11,7 @@ let catalog, pool=[], diagnostics=[], selected=[], activeCoeffIndex=0, loaded=nu
 const timingOf=r=>r.exposure_label||r.crime_exposure||r.exposure||r.timing||null;
 const timingLabel=r=>{const t=timingOf(r);return ({lagyear:'Previous year','previous-year':'Previous year','current-year':'Annual',prior12:'Prior 12 months',annual:'Annual',none:'Not applicable'})[t]||t||'Not specified';};
 const sourceOf=r=>{const source=r.data_source||((String(r.crime||'').startsWith('mps_')||r._iv||/\bmps\b/i.test(r.source||''))?'MPS':r.model||r.specification?'Original Stata':r.source||'Source unspecified');return /mps/i.test(source)?'MPS':/stata|original/i.test(source)?'Original Stata':source;};
-const crimeLabel=r=>({allcrime:'All crime',mps_all:'All crime',violent_crime:'Violence',mps_violence:'Violence',propertycrime:'Property crime',mps_property:'Property crime'})[r.crime]||r.crime||'Crime unspecified';
+const crimeLabel=r=>({allcrime:'All crime',mps_all:'All crime',violentcrime:'Violence',violent_crime:'Violence',mps_violence:'Violence',propertycrime:'Property crime',mps_property:'Property crime'})[r.crime]||r.crime||'Crime unspecified';
 const modelOrder=(a,b)=>Number(String(a.model||'').replace(/^M/i,''))-Number(String(b.model||'').replace(/^M/i,''));
 function decodeSharedSelection(){
  if(!location.hash.startsWith('#compare='))return null;
@@ -24,7 +24,7 @@ function writeSharedSelection(){
  const hash=`#compare=${token}`;if(location.hash!==hash)history.replaceState(null,'',`${location.pathname}${location.search}${hash}`);
 }
 function rowLabel(r){
- const crime={allcrime:'All crime',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'Property-only benchmark'}[r.crime]||r.crime||(r._iv?'Residential burglary':'');
+ const crime={allcrime:'All crime',violentcrime:'Violence',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'Property-only benchmark'}[r.crime]||r.crime||'';
  const data=sourceOf(r);
  const time=timingLabel(r);
  const estimator=r.method==='2SLS'?'IV':r.method||r.estimator||(r.quantile!=null?'Quantile':r._family==='Spatial regressions'?'Spatial':'OLS');
@@ -68,9 +68,9 @@ function prepareComparisons(){
  const fields=['analysis','exposure','specification','method','beta','se','ci_low','ci_high','first_stage_wald_F','partial_R2','AR_95_set'];
  $('diagnostic-table').innerHTML=diagnostics.length?table(fields.map(name),diagnostics.map(r=>fields.map(k=>cell(r[k],k)))):'No IV diagnostics available.';
  const tests=(catalog.diagnostics||[]).flatMap(x=>x.rows);
- const detailRows=tests.map(r=>[r.exposure,r.specification,fmt(r.clustered_wooldridge_chi2),fmt(r.clustered_wooldridge_p,'p-value'),r.reject_exogeneity_5pct?'Reject at 5%':'Do not reject',r.reject_exogeneity_5pct?'Yes*':'Not established',fmt(r.classical_wu_hausman_F),fmt(r.classical_wu_hausman_p,'p-value'),fmt(r.N),fmt(r.clusters)]);
- $('hausman-summary').textContent=tests.length?(()=>{const detailed=tests.filter(r=>/LSOA \+ quarter/i.test(r.specification));const rejects=detailed.filter(r=>r.reject_exogeneity_5pct).length;return detailed.length?`For LSOA + quarter, ${rejects} of ${detailed.length} clustered tests reject exogeneity at 5%. This test assumes the instrument is valid.`:`${tests.length} clustered endogeneity tests available.`})():'No exported Hausman tests found.';
- $('diagnostic-table').innerHTML=tests.length?table(['Timing','Specification','Clustered Wooldridge χ²','Clustered p-value','5% conclusion','IV needed?','Wu–Hausman F¹','Wu–Hausman p¹','N','Clusters'],detailRows):'No exported Hausman tests found.';
+ const detailRows=tests.map(r=>[esc(r.model||r.specification),esc(crimeLabel(r)),esc(timingLabel(r)),fmt(r.clustered_wooldridge_chi2),fmt(r.clustered_wooldridge_p,'p-value'),r.reject_exogeneity_5pct?'Reject at 5%':'Do not reject',fmt(r.first_stage_wald_F),fmt(r.partial_R2),fmt(r.N),fmt(r.clusters)]);
+ $('hausman-summary').textContent=tests.length?`${tests.filter(r=>r.reject_exogeneity_5pct).length} of ${tests.length} M2–M7 clustered tests reject exogeneity at 5%. Rainfall validity remains unverified.`:'No exported endogeneity tests found.';
+ $('diagnostic-table').innerHTML=tests.length?table(['Model','Crime','Timing','Wooldridge χ²','p-value','5% conclusion','Weather-cell first-stage F','Partial R²','N','Weather cells'],detailRows):'No exported endogeneity tests found.';
  const auxiliary=catalog.families.flatMap(f=>f.rows).filter(r=>r.first_stage_wald_F!=null||['First stage','Reduced form'].includes(r.method));
  const auxCols=['exposure','specification','method','beta','se','ci_low','ci_high','p','first_stage_wald_F','partial_R2','AR_95_set'];
  $('other-iv-diagnostics').innerHTML=auxiliary.length?table(auxCols.map(name),auxiliary.map(r=>auxCols.map(k=>cell(r[k],k)))):'No additional IV diagnostics found.';
@@ -139,7 +139,7 @@ function renderCompare(){
  $('comparison').scrollLeft=scroll;
  writeSharedSelection();
  if($('coeff-dialog').open)renderFullCoefficients(activeCoeffIndex);
- $('context').textContent='Cross-analysis comparisons are descriptive: IV targets residential burglary, quantiles target conditional price percentiles, spatial SLX uses individual sales, and Moran statistics use LSOA-year summaries. Check the crime definition, sample, timing and fixed effects in each column. M1 has no crime coefficient.';
+ $('context').textContent='Cross-analysis comparisons are descriptive: rainfall IV targets the three MPS crime types under M2–M7, quantiles target conditional price percentiles, spatial SLX uses individual sales, and Moran statistics use LSOA-year summaries. Rainfall may affect prices directly. Check the sample, timing and fixed effects in each column. M1 has no crime coefficient.';
 }
 function matches(item){return(!$('group').value||item.group===$('group').value)&&(`${item.title} ${item.group}`.toLowerCase().includes($('search').value.toLowerCase()));}
 function browse(){

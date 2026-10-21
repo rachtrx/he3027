@@ -67,7 +67,7 @@ def build():
                 json_target = target.with_suffix('.json')
                 json_target.write_text(json.dumps(dict(columns=columns, rows=rows), allow_nan=False), encoding='utf-8')
                 item.update(columns=columns, rows=len(rows), json=url[:-4]+'.json')
-                if {'clustered_wooldridge_chi2', 'clustered_wooldridge_p', 'classical_wu_hausman_p'} <= set(columns):
+                if {'clustered_wooldridge_chi2', 'clustered_wooldridge_p'} <= set(columns):
                     diagnostics.append(dict(title=group['label'] + ' · Endogeneity tests', columns=columns, rows=rows))
                 if {'variable', 'beta'} <= set(columns):
                     coefficient_tables.append(dict(group=folder.name, columns=columns, rows=rows, title=item['title']))
