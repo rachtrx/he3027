@@ -68,9 +68,9 @@ function prepareComparisons(){
  const fields=['analysis','exposure','specification','method','beta','se','ci_low','ci_high','first_stage_wald_F','partial_R2','AR_95_set'];
  $('diagnostic-table').innerHTML=diagnostics.length?table(fields.map(name),diagnostics.map(r=>fields.map(k=>cell(r[k],k)))):'No IV diagnostics available.';
  const tests=(catalog.diagnostics||[]).flatMap(x=>x.rows);
- const detailRows=tests.map(r=>[esc(r.model||r.specification),esc(crimeLabel(r)),esc(timingLabel(r)),fmt(r.clustered_wooldridge_chi2),fmt(r.clustered_wooldridge_p,'p-value'),r.reject_exogeneity_5pct?'Reject at 5%':'Do not reject',fmt(r.first_stage_wald_F),fmt(r.partial_R2),fmt(r.N),fmt(r.clusters)]);
- $('hausman-summary').textContent=tests.length?`${tests.filter(r=>r.reject_exogeneity_5pct).length} of ${tests.length} M2–M7 clustered tests reject exogeneity at 5%. Rainfall validity remains unverified.`:'No exported endogeneity tests found.';
- $('diagnostic-table').innerHTML=tests.length?table(['Model','Crime','Timing','Wooldridge χ²','p-value','5% conclusion','Weather-cell first-stage F','Partial R²','N','Weather cells'],detailRows):'No exported endogeneity tests found.';
+ const detailRows=tests.map(r=>{const weak=Number(r.first_stage_wald_F)<10;const verdict=r.reject_exogeneity_5pct?'Reject exogeneity H₀':'Do not reject H₀';return[esc(r.model||r.specification),esc(crimeLabel(r)),esc(timingLabel(r)),fmt(r.clustered_wooldridge_chi2),fmt(r.clustered_wooldridge_p,'p-value'),verdict+(weak?' · weak first stage':''),r.reject_exogeneity_5pct?'Yes*':'No*',fmt(r.first_stage_wald_F),fmt(r.partial_R2),fmt(r.N),fmt(r.clusters)];});
+ $('hausman-summary').textContent=tests.length?`${tests.filter(r=>r.reject_exogeneity_5pct).length} of ${tests.length} M2–M7 tests reject the exogeneity null at 5%, conditional on a valid instrument. Weak first stages cannot diagnose endogeneity reliably.`:'No exported endogeneity tests found.';
+ $('diagnostic-table').innerHTML=tests.length?table(['Model','Crime','Timing','Wooldridge χ²','p-value','Conditional test result','Requires IV?*','Weather-cell first-stage F','Partial R²','N','Weather cells'],detailRows):'No exported endogeneity tests found.';
  const auxiliary=catalog.families.flatMap(f=>f.rows).filter(r=>r.first_stage_wald_F!=null||['First stage','Reduced form'].includes(r.method));
  const auxCols=['exposure','specification','method','beta','se','ci_low','ci_high','p','first_stage_wald_F','partial_R2','AR_95_set'];
  $('other-iv-diagnostics').innerHTML=auxiliary.length?table(auxCols.map(name),auxiliary.map(r=>auxCols.map(k=>cell(r[k],k)))):'No additional IV diagnostics found.';
@@ -114,8 +114,8 @@ function renderCompare(){
  const atLimit=selected.length>=rows.length;
  const chosen=selected.map(id=>rows.find(r=>r.id===id));
  const isInteraction=chosen.some(r=>r._family==='Interaction regressions');
- const fields=['model','crime','canonical_exposure',...(isInteraction?['crime_main_beta']:[]),'beta','se','p','ci_low','ci_high','N','r2'].filter(k=>k!=='r2'||chosen.some(r=>r.r2!=null));
- const labels={model:'Model / estimator',crime:'Crime measure',canonical_exposure:'Crime data · exposure',crime_main_beta:'Crime β at mean borough income (04)',beta:isInteraction?'Reported β (04: crime × income)':hatSymbol('β','beta hat'),se:isInteraction?'Reported β standard error':`SE(${hatSymbol('β','beta hat')})`,p:'p-value',ci_low:'95% CI lower',ci_high:'95% CI upper',N:'N',r2:'R²'};
+ const fields=['model','crime','canonical_exposure',...(isInteraction?['crime_main_beta']:[]),'beta','se','p','requires_iv','ci_low','ci_high','N','r2'].filter(k=>k!=='r2'||chosen.some(r=>r.r2!=null));
+ const labels={model:'Model / estimator',crime:'Crime measure',canonical_exposure:'Crime data · exposure',crime_main_beta:'Crime β at mean borough income (04)',beta:isInteraction?'Reported β (04: crime × income)':hatSymbol('β','beta hat'),se:isInteraction?'Reported β standard error':`SE(${hatSymbol('β','beta hat')})`,p:'p-value',requires_iv:'Requires IV?*',ci_low:'95% CI lower',ci_high:'95% CI upper',N:'N',r2:'R²'};
  const shown=(r,k)=>{
   if(k==='crime')return ({allcrime:'All crime',violent_crime:'Violence',propertycrime:'Property crime',mps_all:'All crime',mps_violence:'Violence',mps_property:'Property crime','no crime':'None (benchmark)'})[r[k]]||r[k]||'—';
   if(k==='model'){
@@ -132,6 +132,11 @@ function renderCompare(){
    const main=(r.coefficients||[]).find(c=>c.variable===`crime_${r.crime}_c`);
    return fmt(main?.beta);
   }
+  if(k==='requires_iv'){
+   if(sourceOf(r)!=='MPS'||(!r._iv&&r._family!=='Main regressions'))return '—';
+   const test=(catalog.diagnostics||[]).flatMap(d=>d.rows).find(t=>t.model===r.model&&crimeLabel(t)===crimeLabel(r)&&timingLabel(t)===timingLabel(r));
+   return test?(test.reject_exogeneity_5pct?'Yes*':'No*'):'—';
+  }
   return fmt(r[k],k);
  };
  const scroll=$('comparison').scrollLeft;
@@ -139,7 +144,7 @@ function renderCompare(){
  $('comparison').scrollLeft=scroll;
  writeSharedSelection();
  if($('coeff-dialog').open)renderFullCoefficients(activeCoeffIndex);
- $('context').textContent='Cross-analysis comparisons are descriptive: rainfall IV targets the three MPS crime types under M2–M7, quantiles target conditional price percentiles, spatial SLX uses individual sales, and Moran statistics use LSOA-year summaries. Rainfall may affect prices directly. Check the sample, timing and fixed effects in each column. M1 has no crime coefficient.';
+ $('context').textContent='Cross-analysis comparisons are descriptive: temperature IV targets the three MPS crime types under M2–M7, quantiles target conditional price percentiles, spatial SLX uses individual sales, and Moran statistics use LSOA-year summaries. Heat may affect prices directly. Check the sample, timing and fixed effects in each column. M1 has no crime coefficient.';
 }
 function matches(item){return(!$('group').value||item.group===$('group').value)&&(`${item.title} ${item.group}`.toLowerCase().includes($('search').value.toLowerCase()));}
 function browse(){
