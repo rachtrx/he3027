@@ -1,6 +1,6 @@
 # Regression comparison dashboard
 
-Each of up to five comparison columns selects independently using its header dropdown. Options are grouped in this order: main regressions, interaction regressions, IV and matched OLS/TWFE, quantiles, spatial regressions. Notebook 04's interaction uses prior-12-month MPS crime. Notebook 07's SLX uses individual sales and sale-month prior-12-month own and neighbouring crime; its Moran diagnostics aggregate to LSOA-year. First-stage, reduced-form and IV diagnostic summaries remain in a separate expandable section. Each build versions the JavaScript URL to prevent outdated cached scripts from breaking the updated page.
+Each of up to five comparison columns selects independently using its header dropdown. Options are grouped in this order: main regressions, interaction regressions, IV and matched OLS/TWFE, quantiles, spatial regressions. Notebook 03's interaction uses prior-12-month MPS crime. Notebook 06's SLX uses individual sales and sale-month prior-12-month own and neighbouring crime; its Moran diagnostics aggregate to LSOA-year. First-stage, reduced-form and IV diagnostic summaries remain in a separate expandable section. Each build versions the JavaScript URL to prevent outdated cached scripts from breaking the updated page.
 
 When an interaction regression is selected, the comparison table shows the crime main-effect beta at mean borough income immediately above the crime × income coefficient. The full regression view retains all coefficients and their inference.
 
@@ -18,7 +18,7 @@ Positive estimates are green and negative estimates red. Full coefficient export
 
 After rerunning the notebooks locally, commit the updated output CSVs and figures under `data/`. GitHub Actions rebuilds the dashboard automatically during deployment, so you do not need to run the builder manually.
 
-Commit updated notebook 04–06 result CSVs too. Non-compressed data outputs are trackable; `.gz` files and the housing manifest are ignored.
+Commit updated notebook 03–06 result CSVs too. Non-compressed data outputs are trackable; `.gz` files and the housing manifest are ignored.
 
 ## Enable GitHub Pages
 

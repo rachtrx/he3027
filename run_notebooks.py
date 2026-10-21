@@ -12,10 +12,10 @@ os.chdir(ROOT)
 os.environ.setdefault('MPLBACKEND', 'Agg')
 os.environ.setdefault('OPENBLAS_NUM_THREADS', '1')
 os.environ.setdefault('OMP_NUM_THREADS', '1')
-FILES = ['crime_housing_project_analysis.ipynb', '01_crime_current_year.ipynb',
-         '02_crime_previous_year.ipynb', '03_crime_mps.ipynb',
+FILES = ['crime_housing_project_analysis.ipynb', '01_crime_original.ipynb',
+         '02_crime_mps.ipynb', '03_crime_mps_income_interaction.ipynb',
          '04_crime_iv_exploratory.ipynb', '05_crime_quantile.ipynb',
-         '06_crime_spatial_autocorrelation.ipynb']
+         '06_crime_spatial_autocorrelation.ipynb', '07_crime_results_analysis.ipynb']
 for filename in sys.argv[1:] or FILES:
     path = ROOT / filename
     nb = nbformat.read(path, as_version=4)
