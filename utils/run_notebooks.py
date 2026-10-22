@@ -7,7 +7,7 @@ from nbclient import NotebookClient
 from jupyter_client import KernelManager
 from jupyter_client.kernelspec import KernelSpec
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 os.chdir(ROOT)
 os.environ.setdefault('MPLBACKEND', 'Agg')
 os.environ.setdefault('OPENBLAS_NUM_THREADS', '1')

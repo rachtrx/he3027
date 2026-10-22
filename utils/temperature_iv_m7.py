@@ -1,7 +1,7 @@
-"""Rainfall IV diagnostics for MPS crime, M2--M7, on one common sample.
+"""Hot-day IV diagnostics for MPS crime under M7 on one common sample.
 
 The estimates are exploratory. A first-stage relationship does not establish
-that rainfall satisfies the exclusion restriction for house prices.
+that temperature satisfies the exclusion restriction for house prices.
 """
 
 from __future__ import annotations
@@ -11,16 +11,11 @@ import pandas as pd
 from linearmodels.iv import IV2SLS
 from scipy import stats
 
-import rainfall_iv as base
+from utils import temperature_iv as base
 
 OUT = base.OUT
 PROPERTY = ["detached_dum", "semi_d_dum", "terrace_dum", "freehold", "newbuild"]
 SPECS = [
-    ("M2", PROPERTY, []),
-    ("M3", base.CONTROLS, []),
-    ("M4", base.CONTROLS, ["oslaua", "year"]),
-    ("M5", base.CONTROLS, ["msoa11", "year"]),
-    ("M6", base.CONTROLS, ["msoa11", "yearquarter"]),
     ("M7", base.CONTROLS, ["lsoacode", "yearquarter"]),
 ]
 
@@ -46,8 +41,8 @@ def absorb(matrix: np.ndarray, groups: list[pd.Series]) -> np.ndarray:
 def estimate(data: pd.DataFrame, crime: str, exposure: str,
              model: str, controls: list[str], effects: list[str]) -> dict:
     dname = "log1p_" + base.CRIMES[crime] + "_" + exposure
-    zname = "rainfall_" + exposure
-    # The M2--M7 sequence uses the same complete MPS comparison sample.
+    zname = "hot_days_" + exposure
+    # The nine M7 fits use the same complete MPS comparison sample.
     required = ["lnprice", dname, zname, "lsoacode", "msoa11", "oslaua", "year",
                 "yearquarter", "source_lat", "source_lon"] + base.CONTROLS
     valid = data[required].notna().all(axis=1)
@@ -55,7 +50,7 @@ def estimate(data: pd.DataFrame, crime: str, exposure: str,
     sample = data.loc[valid, required].copy()
     if sample.empty:
         raise ValueError(f"No complete observations: {model} {crime} {exposure}")
-    sample[zname] /= 100  # instrument per 100 mm
+    # Instrument is the number of days with maximum temperature >= 25 C.
     names = ["lnprice", dname, zname] + controls
     matrix = sample[names].to_numpy(float)
     scales = matrix.std(axis=0)
@@ -108,13 +103,13 @@ def estimate(data: pd.DataFrame, crime: str, exposure: str,
     return dict(model=model, crime=crime, exposure=exposure, N=len(sample),
                 lsoa_clusters=sample.lsoacode.nunique(), weather_cell_clusters=G,
                 fixed_effects="; ".join(effects), controls="; ".join(controls),
-                first_stage_beta_per_100mm=fs_beta,
+                first_stage_beta_per_hot_day=fs_beta,
                 first_stage_se_weather_cell=fs_se,
                 first_stage_F_weather_cell=(fs_beta / fs_se) ** 2,
                 first_stage_se_lsoa=fs_se_lsoa,
                 first_stage_F_lsoa=(fs_beta / fs_se_lsoa) ** 2,
                 partial_R2=partial_r2,
-                reduced_form_beta_per_100mm=rf_beta,
+                reduced_form_beta_per_hot_day=rf_beta,
                 reduced_form_se=rf_se, reduced_form_p=rf_p,
                 ols_beta=ols_beta, ols_se=ols_se, ols_p=ols_p,
                 ols_ci_low=ols_low, ols_ci_high=ols_high,
@@ -126,7 +121,7 @@ def estimate(data: pd.DataFrame, crime: str, exposure: str,
 
 def export(rows: list[dict]) -> None:
     full = pd.DataFrame(rows)
-    full.to_csv(OUT / "rainfall_m2_m7_iv_pilot.csv", index=False)
+    full.to_csv(OUT / "temperature_m7_iv_results.csv", index=False)
     tidy = []
     for row in rows:
         for method, prefix in (("OLS", "ols"), ("2SLS", "iv")):
@@ -139,7 +134,7 @@ def export(rows: list[dict]) -> None:
                              first_stage_wald_F=row["first_stage_F_weather_cell"],
                              partial_R2=row["partial_R2"],
                              fixed_effects=row["fixed_effects"]))
-    pd.DataFrame(tidy).to_csv(OUT / "rainfall_regressions.csv", index=False)
+    pd.DataFrame(tidy).to_csv(OUT / "temperature_m7_regressions.csv", index=False)
     tests = full.rename(columns={
         "wooldridge_exogeneity_chi2": "clustered_wooldridge_chi2",
         "wooldridge_exogeneity_p": "clustered_wooldridge_p",
@@ -148,10 +143,13 @@ def export(rows: list[dict]) -> None:
     })
     tests["specification"] = tests.model
     tests["reject_exogeneity_5pct"] = tests.clustered_wooldridge_p.lt(.05)
+    tests["requires_iv_conditional"] = np.where(tests.reject_exogeneity_5pct, "Yes", "No")
+    tests["weak_first_stage_screen"] = tests.first_stage_wald_F.lt(10)
     tests[["model", "crime", "exposure", "specification", "N", "clusters",
            "clustered_wooldridge_chi2", "clustered_wooldridge_p",
-           "reject_exogeneity_5pct", "first_stage_wald_F", "partial_R2"]].to_csv(
-               OUT / "rainfall_endogeneity_tests.csv", index=False)
+           "reject_exogeneity_5pct", "requires_iv_conditional", "weak_first_stage_screen",
+           "first_stage_wald_F", "partial_R2"]].to_csv(
+               OUT / "temperature_m7_endogeneity_tests.csv", index=False)
 
 
 def main() -> None:
@@ -162,7 +160,7 @@ def main() -> None:
             for model, controls, effects in SPECS:
                 print(f"Fitting {exposure} / {crime} / {model}", flush=True)
                 rows.append(estimate(data, crime, exposure, model, controls, effects))
-                pd.DataFrame(rows).to_csv(OUT / "rainfall_m2_m7_iv_pilot.csv", index=False)
+                pd.DataFrame(rows).to_csv(OUT / "temperature_m7_iv_results.csv", index=False)
     export(rows)
     summary = pd.DataFrame(rows)
     print(summary[["model", "crime", "exposure", "N", "first_stage_F_weather_cell",

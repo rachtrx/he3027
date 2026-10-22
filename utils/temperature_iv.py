@@ -11,12 +11,14 @@ from urllib.request import urlopen
 import numpy as np
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 OUT = DATA / "04_crime_iv_outputs"
 OUT.mkdir(exist_ok=True)
-CACHE = OUT / "open_meteo_hot_days_25c_monthly.csv.gz"
-LOCATION = OUT / "lsoa_weather_locations.csv"
+SOURCE = ROOT / "project_data" / "temperature"
+SOURCE.mkdir(parents=True, exist_ok=True)
+CACHE = SOURCE / "open_meteo_hot_days_25c_monthly.csv.gz"
+LOCATION = SOURCE / "lsoa_weather_locations.csv"
 START, END = "2011-01-01", "2015-12-31"
 CRIMES = {"allcrime": "mps_all", "violentcrime": "mps_violence",
           "propertycrime": "mps_property"}

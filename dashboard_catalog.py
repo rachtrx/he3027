@@ -39,7 +39,9 @@ def build():
     for folder in sorted((ROOT / 'data').glob('*outputs')):
         if not folder.is_dir():
             continue
-        group = {'id': folder.name, 'label': title(folder.name.removesuffix('_outputs')), 'files': 0}
+        label = ('08 · Original Stata crime · restricted sale years' if folder.name == '08_crime_original_robustness_outputs'
+                 else title(folder.name.removesuffix('_outputs')))
+        group = {'id': folder.name, 'label': label, 'files': 0}
         groups.append(group)
         for path in sorted(folder.rglob('*')):
             if not path.is_file() or path.is_symlink() or path.suffix.lower() not in ('.csv', '.png', '.jpg', '.jpeg', '.webp', '.gif'):
@@ -67,16 +69,17 @@ def build():
                 json_target = target.with_suffix('.json')
                 json_target.write_text(json.dumps(dict(columns=columns, rows=rows), allow_nan=False), encoding='utf-8')
                 item.update(columns=columns, rows=len(rows), json=url[:-4]+'.json')
-                if {'clustered_wooldridge_chi2', 'clustered_wooldridge_p'} <= set(columns):
+                if path.name == 'temperature_m7_endogeneity_tests.csv':
                     diagnostics.append(dict(title=group['label'] + ' · Endogeneity tests', columns=columns, rows=rows))
                 if {'variable', 'beta'} <= set(columns):
                     coefficient_tables.append(dict(group=folder.name, columns=columns, rows=rows, title=item['title']))
                 # Identify statistical summaries by schema, not filename.
-                if {'model','crime','beta','N','panel'} <= set(columns) and 'variable' not in columns:
+                robustness_summary = folder.name != '08_crime_original_robustness_outputs' or path.stem in {'combined_primary_models', 'combined_2012_2013_models'}
+                if {'model','crime','beta','N','panel'} <= set(columns) and 'variable' not in columns and robustness_summary:
                     for row in rows:
                         key = json.dumps([folder.name,row],sort_keys=True)
                         main.append(dict(row, id=hashlib.sha256(key.encode()).hexdigest()[:20], source=group['label'], output=item['title'], _group=folder.name))
-                elif {'beta','N'} <= set(columns) and 'variable' not in columns and any(c in columns for c in ['method','quantile','specification']):
+                elif {'beta','N'} <= set(columns) and 'variable' not in columns and any(c in columns for c in ['method','quantile','specification']) and (folder.name != '04_crime_iv_outputs' or path.stem == 'temperature_m7_regressions'):
                     families.append(dict(id=item['id'], label=group['label']+' · '+item['title'], columns=columns,
                                          rows=[dict(r,id=str(i)) for i,r in enumerate(rows)]))
             files.append(item)
