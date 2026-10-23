@@ -95,7 +95,10 @@ def main():
         ('04 · Temperature IV pilot · M7', '04_crime_iv_outputs', 'temperature_m7_regressions.csv', [], 'MPS crime under M7, instrumented with coarse hot-day counts. Heat may affect prices directly; estimates are exploratory.'),
         ('05 · Price quantiles', '05_crime_quantile_outputs', 'quantile_points.csv', ['crime', 'quantile', 'beta', 'ci_low', 'ci_high', 'N'], 'Conditional quantile estimates use a reproducible sample and clustered bootstrap intervals.'),
         ('06 · Neighbourhood effects', '06_crime_spatial_outputs', 'spatial_regressions.csv', ['specification', 'k', 'crime', 'beta', 'se', 'ci_low', 'ci_high', 'N'], 'Transaction-level regressions use sale-month prior12 own and neighbouring crime, LSOA and year-quarter effects. The reported beta is own-area crime.'),
-        ('06 · Spatial clustering', '06_crime_spatial_outputs', 'moran_diagnostics.csv', ['k', 'year', 'variable', 'moran_I', 'permutation_p', 'permutations'], "Area-year Moran diagnostics describe spatial clustering; they are not causal effects."),
+        ('06 · Quarterly spatial clustering', '06_crime_spatial_outputs', 'moran_diagnostics.csv', [], "Quarterly crime Moran's I; parentheses show Moran's I of the corresponding transaction-level own-crime price residuals averaged within LSOA-quarter. Residual permutation tests are exploratory."),
+        ('06 · Mean house-price spatial clustering', '06_crime_spatial_outputs', 'moran_diagnostics_price.csv', [], "Quarterly Moran's I for LSOA-quarter mean log house prices on the spatial transaction sample."),
+        ('06 · Quarterly spatial clustering · formatted', '06_crime_spatial_outputs', 'moran_diagnostics_crime_formatted.csv', [], "Four-decimal Moran values for crime and own-crime price residuals by quarter and neighbour definition. A star denotes permutation p < 0.05; residual inference is exploratory."),
+        ('06 · Mean house-price spatial clustering · formatted', '06_crime_spatial_outputs', 'moran_diagnostics_price_formatted.csv', [], "Four-decimal Moran values for LSOA-quarter mean log prices. A star denotes permutation p < 0.05."),
     ]:
         path = DATA / folder / filename
         rows = [{k: number(v) for k, v in row.items() if k and k != 'Unnamed: 0'} for row in read_csv(path)] if path.exists() else []

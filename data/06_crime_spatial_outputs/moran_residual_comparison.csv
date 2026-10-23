@@ -1,0 +1,253 @@
+k,yearquarter,year,variable,moran_I,permutation_p,permutations,lsoas,sales,crime,model
+4,2012Q1,2012,residual_own_mps_all,0.0835069319302989,0.005,199,4225,19766,mps_all,Own crime only
+4,2012Q1,2012,residual_own_mps_violence,0.08350315454585915,0.005,199,4225,19766,mps_violence,Own crime only
+4,2012Q1,2012,residual_own_mps_property,0.08344826357044681,0.005,199,4225,19766,mps_property,Own crime only
+4,2012Q1,2012,residual_slx_mps_all,0.08340537526071023,0.005,199,4225,19766,mps_all,Own + matching neighbours
+4,2012Q1,2012,residual_slx_mps_violence,0.08265533111417424,0.005,199,4225,19766,mps_violence,Own + matching neighbours
+4,2012Q1,2012,residual_slx_mps_property,0.08360854292946011,0.005,199,4225,19766,mps_property,Own + matching neighbours
+8,2012Q1,2012,residual_own_mps_all,0.08646276484421354,0.005,199,4226,19767,mps_all,Own crime only
+8,2012Q1,2012,residual_own_mps_violence,0.0864595213154851,0.005,199,4226,19767,mps_violence,Own crime only
+8,2012Q1,2012,residual_own_mps_property,0.08641372246091555,0.005,199,4226,19767,mps_property,Own crime only
+8,2012Q1,2012,residual_slx_mps_all,0.08656736107936489,0.005,199,4226,19767,mps_all,Own + matching neighbours
+8,2012Q1,2012,residual_slx_mps_violence,0.08528749388128198,0.005,199,4226,19767,mps_violence,Own + matching neighbours
+8,2012Q1,2012,residual_slx_mps_property,0.08670640709841183,0.005,199,4226,19767,mps_property,Own + matching neighbours
+12,2012Q1,2012,residual_own_mps_all,0.08792678541052971,0.005,199,4226,19767,mps_all,Own crime only
+12,2012Q1,2012,residual_own_mps_violence,0.08792340350672065,0.005,199,4226,19767,mps_violence,Own crime only
+12,2012Q1,2012,residual_own_mps_property,0.08787785030894393,0.005,199,4226,19767,mps_property,Own crime only
+12,2012Q1,2012,residual_slx_mps_all,0.08801807762215888,0.005,199,4226,19767,mps_all,Own + matching neighbours
+12,2012Q1,2012,residual_slx_mps_violence,0.0867416612150992,0.005,199,4226,19767,mps_violence,Own + matching neighbours
+12,2012Q1,2012,residual_slx_mps_property,0.08805707868435218,0.005,199,4226,19767,mps_property,Own + matching neighbours
+4,2012Q2,2012,residual_own_mps_all,0.00884243423743667,0.45,199,4128,19088,mps_all,Own crime only
+4,2012Q2,2012,residual_own_mps_violence,0.00883912447760514,0.45,199,4128,19088,mps_violence,Own crime only
+4,2012Q2,2012,residual_own_mps_property,0.008847872770633619,0.45,199,4128,19088,mps_property,Own crime only
+4,2012Q2,2012,residual_slx_mps_all,0.008520306384139397,0.465,199,4128,19088,mps_all,Own + matching neighbours
+4,2012Q2,2012,residual_slx_mps_violence,0.00861637470291917,0.465,199,4128,19088,mps_violence,Own + matching neighbours
+4,2012Q2,2012,residual_slx_mps_property,0.008701754744324148,0.455,199,4128,19088,mps_property,Own + matching neighbours
+8,2012Q2,2012,residual_own_mps_all,0.017699960111926625,0.04,199,4128,19088,mps_all,Own crime only
+8,2012Q2,2012,residual_own_mps_violence,0.017697727190269956,0.04,199,4128,19088,mps_violence,Own crime only
+8,2012Q2,2012,residual_own_mps_property,0.017715140132653073,0.04,199,4128,19088,mps_property,Own crime only
+8,2012Q2,2012,residual_slx_mps_all,0.017442079979618615,0.04,199,4128,19088,mps_all,Own + matching neighbours
+8,2012Q2,2012,residual_slx_mps_violence,0.017283469464371665,0.04,199,4128,19088,mps_violence,Own + matching neighbours
+8,2012Q2,2012,residual_slx_mps_property,0.017658846131056952,0.04,199,4128,19088,mps_property,Own + matching neighbours
+12,2012Q2,2012,residual_own_mps_all,0.017828323541874528,0.01,199,4128,19088,mps_all,Own crime only
+12,2012Q2,2012,residual_own_mps_violence,0.017826336927151253,0.01,199,4128,19088,mps_violence,Own crime only
+12,2012Q2,2012,residual_own_mps_property,0.017836803568328494,0.01,199,4128,19088,mps_property,Own crime only
+12,2012Q2,2012,residual_slx_mps_all,0.01760621986747559,0.01,199,4128,19088,mps_all,Own + matching neighbours
+12,2012Q2,2012,residual_slx_mps_violence,0.017390758668949003,0.01,199,4128,19088,mps_violence,Own + matching neighbours
+12,2012Q2,2012,residual_slx_mps_property,0.0178111140947511,0.01,199,4128,19088,mps_property,Own + matching neighbours
+4,2012Q3,2012,residual_own_mps_all,0.018345264554716457,0.09,199,4226,22394,mps_all,Own crime only
+4,2012Q3,2012,residual_own_mps_violence,0.018343733999281995,0.09,199,4226,22394,mps_violence,Own crime only
+4,2012Q3,2012,residual_own_mps_property,0.018399038091217318,0.085,199,4226,22394,mps_property,Own crime only
+4,2012Q3,2012,residual_slx_mps_all,0.01814230942665284,0.09,199,4226,22394,mps_all,Own + matching neighbours
+4,2012Q3,2012,residual_slx_mps_violence,0.018425842217273967,0.085,199,4226,22394,mps_violence,Own + matching neighbours
+4,2012Q3,2012,residual_slx_mps_property,0.018332391421661445,0.09,199,4226,22394,mps_property,Own + matching neighbours
+8,2012Q3,2012,residual_own_mps_all,0.023652212342840616,0.01,199,4227,22395,mps_all,Own crime only
+8,2012Q3,2012,residual_own_mps_violence,0.023650976975860456,0.01,199,4227,22395,mps_violence,Own crime only
+8,2012Q3,2012,residual_own_mps_property,0.02368323979975601,0.005,199,4227,22395,mps_property,Own crime only
+8,2012Q3,2012,residual_slx_mps_all,0.023423948005857214,0.01,199,4227,22395,mps_all,Own + matching neighbours
+8,2012Q3,2012,residual_slx_mps_violence,0.023532777236167222,0.01,199,4227,22395,mps_violence,Own + matching neighbours
+8,2012Q3,2012,residual_slx_mps_property,0.02361370369157661,0.01,199,4227,22395,mps_property,Own + matching neighbours
+12,2012Q3,2012,residual_own_mps_all,0.029823272857673864,0.005,199,4227,22395,mps_all,Own crime only
+12,2012Q3,2012,residual_own_mps_violence,0.029822029097801614,0.005,199,4227,22395,mps_violence,Own crime only
+12,2012Q3,2012,residual_own_mps_property,0.02984741567322393,0.005,199,4227,22395,mps_property,Own crime only
+12,2012Q3,2012,residual_slx_mps_all,0.02968311831674836,0.005,199,4227,22395,mps_all,Own + matching neighbours
+12,2012Q3,2012,residual_slx_mps_violence,0.02963513372811691,0.005,199,4227,22395,mps_violence,Own + matching neighbours
+12,2012Q3,2012,residual_slx_mps_property,0.029820233013286943,0.005,199,4227,22395,mps_property,Own + matching neighbours
+4,2012Q4,2012,residual_own_mps_all,0.02520020992026964,0.025,199,4199,21199,mps_all,Own crime only
+4,2012Q4,2012,residual_own_mps_violence,0.025200516605100913,0.025,199,4199,21199,mps_violence,Own crime only
+4,2012Q4,2012,residual_own_mps_property,0.025183448691495223,0.025,199,4199,21199,mps_property,Own crime only
+4,2012Q4,2012,residual_slx_mps_all,0.025432741817684772,0.025,199,4199,21199,mps_all,Own + matching neighbours
+4,2012Q4,2012,residual_slx_mps_violence,0.025075712119255657,0.025,199,4199,21199,mps_violence,Own + matching neighbours
+4,2012Q4,2012,residual_slx_mps_property,0.025276364707957404,0.025,199,4199,21199,mps_property,Own + matching neighbours
+8,2012Q4,2012,residual_own_mps_all,0.022904933559475236,0.005,199,4200,21200,mps_all,Own crime only
+8,2012Q4,2012,residual_own_mps_violence,0.022904691867911893,0.005,199,4200,21200,mps_violence,Own crime only
+8,2012Q4,2012,residual_own_mps_property,0.022895114424665602,0.005,199,4200,21200,mps_property,Own crime only
+8,2012Q4,2012,residual_slx_mps_all,0.023200790565578812,0.005,199,4200,21200,mps_all,Own + matching neighbours
+8,2012Q4,2012,residual_slx_mps_violence,0.022872388497449467,0.005,199,4200,21200,mps_violence,Own + matching neighbours
+8,2012Q4,2012,residual_slx_mps_property,0.02299542922768287,0.005,199,4200,21200,mps_property,Own + matching neighbours
+12,2012Q4,2012,residual_own_mps_all,0.021484585289475937,0.005,199,4200,21200,mps_all,Own crime only
+12,2012Q4,2012,residual_own_mps_violence,0.02148422125443075,0.005,199,4200,21200,mps_violence,Own crime only
+12,2012Q4,2012,residual_own_mps_property,0.02147952087294235,0.005,199,4200,21200,mps_property,Own crime only
+12,2012Q4,2012,residual_slx_mps_all,0.021692719035613386,0.005,199,4200,21200,mps_all,Own + matching neighbours
+12,2012Q4,2012,residual_slx_mps_violence,0.021474463690678135,0.005,199,4200,21200,mps_violence,Own + matching neighbours
+12,2012Q4,2012,residual_slx_mps_property,0.021530628583687237,0.005,199,4200,21200,mps_property,Own + matching neighbours
+4,2013Q1,2013,residual_own_mps_all,0.013510600583008072,0.24,199,4184,18777,mps_all,Own crime only
+4,2013Q1,2013,residual_own_mps_violence,0.013509228716377684,0.24,199,4184,18777,mps_violence,Own crime only
+4,2013Q1,2013,residual_own_mps_property,0.013501275151605973,0.24,199,4184,18777,mps_property,Own crime only
+4,2013Q1,2013,residual_slx_mps_all,0.013759974243885028,0.235,199,4184,18777,mps_all,Own + matching neighbours
+4,2013Q1,2013,residual_slx_mps_violence,0.013638204953554658,0.24,199,4184,18777,mps_violence,Own + matching neighbours
+4,2013Q1,2013,residual_slx_mps_property,0.01359167183997007,0.24,199,4184,18777,mps_property,Own + matching neighbours
+8,2013Q1,2013,residual_own_mps_all,0.01703870111595736,0.04,199,4184,18777,mps_all,Own crime only
+8,2013Q1,2013,residual_own_mps_violence,0.01703766149654117,0.04,199,4184,18777,mps_violence,Own crime only
+8,2013Q1,2013,residual_own_mps_property,0.01702477464059265,0.04,199,4184,18777,mps_property,Own crime only
+8,2013Q1,2013,residual_slx_mps_all,0.017332941889863195,0.035,199,4184,18777,mps_all,Own + matching neighbours
+8,2013Q1,2013,residual_slx_mps_violence,0.017045617668400282,0.04,199,4184,18777,mps_violence,Own + matching neighbours
+8,2013Q1,2013,residual_slx_mps_property,0.01714792282935603,0.04,199,4184,18777,mps_property,Own + matching neighbours
+12,2013Q1,2013,residual_own_mps_all,0.016730522076699447,0.02,199,4184,18777,mps_all,Own crime only
+12,2013Q1,2013,residual_own_mps_violence,0.01672986584606706,0.02,199,4184,18777,mps_violence,Own crime only
+12,2013Q1,2013,residual_own_mps_property,0.0167150446301731,0.02,199,4184,18777,mps_property,Own crime only
+12,2013Q1,2013,residual_slx_mps_all,0.01695738662445832,0.02,199,4184,18777,mps_all,Own + matching neighbours
+12,2013Q1,2013,residual_slx_mps_violence,0.016727042316947025,0.02,199,4184,18777,mps_violence,Own + matching neighbours
+12,2013Q1,2013,residual_slx_mps_property,0.016781816387855118,0.02,199,4184,18777,mps_property,Own + matching neighbours
+4,2013Q2,2013,residual_own_mps_all,0.017065685734249558,0.125,199,4225,22532,mps_all,Own crime only
+4,2013Q2,2013,residual_own_mps_violence,0.017066665512557838,0.125,199,4225,22532,mps_violence,Own crime only
+4,2013Q2,2013,residual_own_mps_property,0.0170833504333577,0.125,199,4225,22532,mps_property,Own crime only
+4,2013Q2,2013,residual_slx_mps_all,0.017048047888753397,0.125,199,4225,22532,mps_all,Own + matching neighbours
+4,2013Q2,2013,residual_slx_mps_violence,0.01714886861462707,0.125,199,4225,22532,mps_violence,Own + matching neighbours
+4,2013Q2,2013,residual_slx_mps_property,0.01707103814807158,0.125,199,4225,22532,mps_property,Own + matching neighbours
+8,2013Q2,2013,residual_own_mps_all,0.007807863389241541,0.4,199,4225,22532,mps_all,Own crime only
+8,2013Q2,2013,residual_own_mps_violence,0.007808154306185247,0.4,199,4225,22532,mps_violence,Own crime only
+8,2013Q2,2013,residual_own_mps_property,0.007819663862743789,0.4,199,4225,22532,mps_property,Own crime only
+8,2013Q2,2013,residual_slx_mps_all,0.008035056796265113,0.37,199,4225,22532,mps_all,Own + matching neighbours
+8,2013Q2,2013,residual_slx_mps_violence,0.008032544194612279,0.385,199,4225,22532,mps_violence,Own + matching neighbours
+8,2013Q2,2013,residual_slx_mps_property,0.007884763223406064,0.39,199,4225,22532,mps_property,Own + matching neighbours
+12,2013Q2,2013,residual_own_mps_all,0.008277197191529473,0.2,199,4225,22532,mps_all,Own crime only
+12,2013Q2,2013,residual_own_mps_violence,0.008277057850090336,0.2,199,4225,22532,mps_violence,Own crime only
+12,2013Q2,2013,residual_own_mps_property,0.008282710474758544,0.2,199,4225,22532,mps_property,Own crime only
+12,2013Q2,2013,residual_slx_mps_all,0.008464076245947038,0.195,199,4225,22532,mps_all,Own + matching neighbours
+12,2013Q2,2013,residual_slx_mps_violence,0.00857257521580196,0.195,199,4225,22532,mps_violence,Own + matching neighbours
+12,2013Q2,2013,residual_slx_mps_property,0.008318839425294962,0.2,199,4225,22532,mps_property,Own + matching neighbours
+4,2013Q3,2013,residual_own_mps_all,0.0027941913189321248,0.73,199,4338,28685,mps_all,Own crime only
+4,2013Q3,2013,residual_own_mps_violence,0.0027929075688633807,0.73,199,4338,28685,mps_violence,Own crime only
+4,2013Q3,2013,residual_own_mps_property,0.002794486817776479,0.735,199,4338,28685,mps_property,Own crime only
+4,2013Q3,2013,residual_slx_mps_all,0.002924401210969495,0.725,199,4338,28685,mps_all,Own + matching neighbours
+4,2013Q3,2013,residual_slx_mps_violence,0.002834357408274959,0.73,199,4338,28685,mps_violence,Own + matching neighbours
+4,2013Q3,2013,residual_slx_mps_property,0.0027561406897787535,0.735,199,4338,28685,mps_property,Own + matching neighbours
+8,2013Q3,2013,residual_own_mps_all,0.01643934073552763,0.05,199,4338,28685,mps_all,Own crime only
+8,2013Q3,2013,residual_own_mps_violence,0.016437752734946572,0.05,199,4338,28685,mps_violence,Own crime only
+8,2013Q3,2013,residual_own_mps_property,0.01644771545407638,0.05,199,4338,28685,mps_property,Own crime only
+8,2013Q3,2013,residual_slx_mps_all,0.01665659628632192,0.045,199,4338,28685,mps_all,Own + matching neighbours
+8,2013Q3,2013,residual_slx_mps_violence,0.016524421560343353,0.05,199,4338,28685,mps_violence,Own + matching neighbours
+8,2013Q3,2013,residual_slx_mps_property,0.01642356031103182,0.05,199,4338,28685,mps_property,Own + matching neighbours
+12,2013Q3,2013,residual_own_mps_all,0.019687350534556936,0.005,199,4338,28685,mps_all,Own crime only
+12,2013Q3,2013,residual_own_mps_violence,0.019686547584840234,0.005,199,4338,28685,mps_violence,Own crime only
+12,2013Q3,2013,residual_own_mps_property,0.019692036708507537,0.005,199,4338,28685,mps_property,Own crime only
+12,2013Q3,2013,residual_slx_mps_all,0.01986867708289936,0.005,199,4338,28685,mps_all,Own + matching neighbours
+12,2013Q3,2013,residual_slx_mps_violence,0.019759738058275585,0.005,199,4338,28685,mps_violence,Own + matching neighbours
+12,2013Q3,2013,residual_slx_mps_property,0.019685760263926752,0.005,199,4338,28685,mps_property,Own + matching neighbours
+4,2013Q4,2013,residual_own_mps_all,-0.01640967941840505,0.12,199,4324,28582,mps_all,Own crime only
+4,2013Q4,2013,residual_own_mps_violence,-0.016409808862541682,0.12,199,4324,28582,mps_violence,Own crime only
+4,2013Q4,2013,residual_own_mps_property,-0.016418134810455978,0.12,199,4324,28582,mps_property,Own crime only
+4,2013Q4,2013,residual_slx_mps_all,-0.016327205008474427,0.125,199,4324,28582,mps_all,Own + matching neighbours
+4,2013Q4,2013,residual_slx_mps_violence,-0.01624291688813304,0.13,199,4324,28582,mps_violence,Own + matching neighbours
+4,2013Q4,2013,residual_slx_mps_property,-0.016430541360141968,0.12,199,4324,28582,mps_property,Own + matching neighbours
+8,2013Q4,2013,residual_own_mps_all,-0.003160741792638169,0.735,199,4324,28582,mps_all,Own crime only
+8,2013Q4,2013,residual_own_mps_violence,-0.003160716840020436,0.735,199,4324,28582,mps_violence,Own crime only
+8,2013Q4,2013,residual_own_mps_property,-0.0031671401282570744,0.735,199,4324,28582,mps_property,Own crime only
+8,2013Q4,2013,residual_slx_mps_all,-0.003020144705156822,0.74,199,4324,28582,mps_all,Own + matching neighbours
+8,2013Q4,2013,residual_slx_mps_violence,-0.0029529187661290097,0.75,199,4324,28582,mps_violence,Own + matching neighbours
+8,2013Q4,2013,residual_slx_mps_property,-0.0031584584434046904,0.735,199,4324,28582,mps_property,Own + matching neighbours
+12,2013Q4,2013,residual_own_mps_all,-0.001088878823660419,0.895,199,4324,28582,mps_all,Own crime only
+12,2013Q4,2013,residual_own_mps_violence,-0.001088876974501159,0.895,199,4324,28582,mps_violence,Own crime only
+12,2013Q4,2013,residual_own_mps_property,-0.0010957142173567299,0.895,199,4324,28582,mps_property,Own crime only
+12,2013Q4,2013,residual_slx_mps_all,-0.0010149151690656564,0.92,199,4324,28582,mps_all,Own + matching neighbours
+12,2013Q4,2013,residual_slx_mps_violence,-0.0009307718453350091,0.925,199,4324,28582,mps_violence,Own + matching neighbours
+12,2013Q4,2013,residual_slx_mps_property,-0.0010982570464955386,0.895,199,4324,28582,mps_property,Own + matching neighbours
+4,2014Q1,2014,residual_own_mps_all,-0.00649636965309743,0.605,199,4305,24792,mps_all,Own crime only
+4,2014Q1,2014,residual_own_mps_violence,-0.006497650942627586,0.605,199,4305,24792,mps_violence,Own crime only
+4,2014Q1,2014,residual_own_mps_property,-0.0064942469335936,0.615,199,4305,24792,mps_property,Own crime only
+4,2014Q1,2014,residual_slx_mps_all,-0.006459034474736652,0.605,199,4305,24792,mps_all,Own + matching neighbours
+4,2014Q1,2014,residual_slx_mps_violence,-0.006512783666245316,0.61,199,4305,24792,mps_violence,Own + matching neighbours
+4,2014Q1,2014,residual_slx_mps_property,-0.006485381983252466,0.605,199,4305,24792,mps_property,Own + matching neighbours
+8,2014Q1,2014,residual_own_mps_all,-0.013292192359177939,0.12,199,4305,24792,mps_all,Own crime only
+8,2014Q1,2014,residual_own_mps_violence,-0.0132932408187582,0.12,199,4305,24792,mps_violence,Own crime only
+8,2014Q1,2014,residual_own_mps_property,-0.013292827730770621,0.12,199,4305,24792,mps_property,Own crime only
+8,2014Q1,2014,residual_slx_mps_all,-0.013227865559492942,0.115,199,4305,24792,mps_all,Own + matching neighbours
+8,2014Q1,2014,residual_slx_mps_violence,-0.01343485557166125,0.115,199,4305,24792,mps_violence,Own + matching neighbours
+8,2014Q1,2014,residual_slx_mps_property,-0.013268192240357649,0.12,199,4305,24792,mps_property,Own + matching neighbours
+12,2014Q1,2014,residual_own_mps_all,-0.008340512992472663,0.2,199,4305,24792,mps_all,Own crime only
+12,2014Q1,2014,residual_own_mps_violence,-0.00834107780923223,0.2,199,4305,24792,mps_violence,Own crime only
+12,2014Q1,2014,residual_own_mps_property,-0.008342055445531404,0.2,199,4305,24792,mps_property,Own crime only
+12,2014Q1,2014,residual_slx_mps_all,-0.008269557968909436,0.215,199,4305,24792,mps_all,Own + matching neighbours
+12,2014Q1,2014,residual_slx_mps_violence,-0.00850007635481506,0.19,199,4305,24792,mps_violence,Own + matching neighbours
+12,2014Q1,2014,residual_slx_mps_property,-0.008323209766261509,0.205,199,4305,24792,mps_property,Own + matching neighbours
+4,2014Q2,2014,residual_own_mps_all,0.04572509394465866,0.005,199,4325,25696,mps_all,Own crime only
+4,2014Q2,2014,residual_own_mps_violence,0.04572296189252317,0.005,199,4325,25696,mps_violence,Own crime only
+4,2014Q2,2014,residual_own_mps_property,0.04575490518658305,0.005,199,4325,25696,mps_property,Own crime only
+4,2014Q2,2014,residual_slx_mps_all,0.045585801945039334,0.005,199,4325,25696,mps_all,Own + matching neighbours
+4,2014Q2,2014,residual_slx_mps_violence,0.04558031987893886,0.005,199,4325,25696,mps_violence,Own + matching neighbours
+4,2014Q2,2014,residual_slx_mps_property,0.04573113932821873,0.005,199,4325,25696,mps_property,Own + matching neighbours
+8,2014Q2,2014,residual_own_mps_all,0.04013591990349717,0.005,199,4325,25696,mps_all,Own crime only
+8,2014Q2,2014,residual_own_mps_violence,0.040134253920981716,0.005,199,4325,25696,mps_violence,Own crime only
+8,2014Q2,2014,residual_own_mps_property,0.04014602208990507,0.005,199,4325,25696,mps_property,Own crime only
+8,2014Q2,2014,residual_slx_mps_all,0.040102405986223506,0.005,199,4325,25696,mps_all,Own + matching neighbours
+8,2014Q2,2014,residual_slx_mps_violence,0.040015755283837565,0.005,199,4325,25696,mps_violence,Own + matching neighbours
+8,2014Q2,2014,residual_slx_mps_property,0.04017385522808979,0.005,199,4325,25696,mps_property,Own + matching neighbours
+12,2014Q2,2014,residual_own_mps_all,0.037988946861500006,0.005,199,4325,25696,mps_all,Own crime only
+12,2014Q2,2014,residual_own_mps_violence,0.03798756530478232,0.005,199,4325,25696,mps_violence,Own crime only
+12,2014Q2,2014,residual_own_mps_property,0.037995808851628586,0.005,199,4325,25696,mps_property,Own crime only
+12,2014Q2,2014,residual_slx_mps_all,0.03799589140384884,0.005,199,4325,25696,mps_all,Own + matching neighbours
+12,2014Q2,2014,residual_slx_mps_violence,0.037839833211769855,0.005,199,4325,25696,mps_violence,Own + matching neighbours
+12,2014Q2,2014,residual_slx_mps_property,0.03802153747408066,0.005,199,4325,25696,mps_property,Own + matching neighbours
+4,2014Q3,2014,residual_own_mps_all,0.02055547203361162,0.065,199,4333,28411,mps_all,Own crime only
+4,2014Q3,2014,residual_own_mps_violence,0.02055346267626596,0.065,199,4333,28411,mps_violence,Own crime only
+4,2014Q3,2014,residual_own_mps_property,0.020567501631804663,0.065,199,4333,28411,mps_property,Own crime only
+4,2014Q3,2014,residual_slx_mps_all,0.020510893809933664,0.065,199,4333,28411,mps_all,Own + matching neighbours
+4,2014Q3,2014,residual_slx_mps_violence,0.020371379891516647,0.065,199,4333,28411,mps_violence,Own + matching neighbours
+4,2014Q3,2014,residual_slx_mps_property,0.020632059526653528,0.065,199,4333,28411,mps_property,Own + matching neighbours
+8,2014Q3,2014,residual_own_mps_all,0.02479366205929256,0.005,199,4333,28411,mps_all,Own crime only
+8,2014Q3,2014,residual_own_mps_violence,0.024792557254448143,0.005,199,4333,28411,mps_violence,Own crime only
+8,2014Q3,2014,residual_own_mps_property,0.024796735779467588,0.005,199,4333,28411,mps_property,Own crime only
+8,2014Q3,2014,residual_slx_mps_all,0.02464962380495931,0.005,199,4333,28411,mps_all,Own + matching neighbours
+8,2014Q3,2014,residual_slx_mps_violence,0.024576684126263897,0.005,199,4333,28411,mps_violence,Own + matching neighbours
+8,2014Q3,2014,residual_slx_mps_property,0.02481200740382173,0.005,199,4333,28411,mps_property,Own + matching neighbours
+12,2014Q3,2014,residual_own_mps_all,0.026071272905016585,0.005,199,4333,28411,mps_all,Own crime only
+12,2014Q3,2014,residual_own_mps_violence,0.026070366894272234,0.005,199,4333,28411,mps_violence,Own crime only
+12,2014Q3,2014,residual_own_mps_property,0.026075164636647382,0.005,199,4333,28411,mps_property,Own crime only
+12,2014Q3,2014,residual_slx_mps_all,0.02597003810354062,0.005,199,4333,28411,mps_all,Own + matching neighbours
+12,2014Q3,2014,residual_slx_mps_violence,0.025875411061568963,0.005,199,4333,28411,mps_violence,Own + matching neighbours
+12,2014Q3,2014,residual_slx_mps_property,0.026088078979486982,0.005,199,4333,28411,mps_property,Own + matching neighbours
+4,2014Q4,2014,residual_own_mps_all,0.027118611342543994,0.015,199,4313,24991,mps_all,Own crime only
+4,2014Q4,2014,residual_own_mps_violence,0.027117722983689314,0.015,199,4313,24991,mps_violence,Own crime only
+4,2014Q4,2014,residual_own_mps_property,0.02708611481254015,0.015,199,4313,24991,mps_property,Own crime only
+4,2014Q4,2014,residual_slx_mps_all,0.027324129208886317,0.01,199,4313,24991,mps_all,Own + matching neighbours
+4,2014Q4,2014,residual_slx_mps_violence,0.02707663248020925,0.015,199,4313,24991,mps_violence,Own + matching neighbours
+4,2014Q4,2014,residual_slx_mps_property,0.02720943934273872,0.015,199,4313,24991,mps_property,Own + matching neighbours
+8,2014Q4,2014,residual_own_mps_all,0.02586792547315221,0.005,199,4313,24991,mps_all,Own crime only
+8,2014Q4,2014,residual_own_mps_violence,0.025866870851944692,0.005,199,4313,24991,mps_violence,Own crime only
+8,2014Q4,2014,residual_own_mps_property,0.02585037652106885,0.005,199,4313,24991,mps_property,Own crime only
+8,2014Q4,2014,residual_slx_mps_all,0.02610961350641171,0.005,199,4313,24991,mps_all,Own + matching neighbours
+8,2014Q4,2014,residual_slx_mps_violence,0.025548415539882983,0.005,199,4313,24991,mps_violence,Own + matching neighbours
+8,2014Q4,2014,residual_slx_mps_property,0.025974121006365723,0.005,199,4313,24991,mps_property,Own + matching neighbours
+12,2014Q4,2014,residual_own_mps_all,0.024222400922093455,0.005,199,4313,24991,mps_all,Own crime only
+12,2014Q4,2014,residual_own_mps_violence,0.02422108817452419,0.005,199,4313,24991,mps_violence,Own crime only
+12,2014Q4,2014,residual_own_mps_property,0.02421086311726249,0.005,199,4313,24991,mps_property,Own crime only
+12,2014Q4,2014,residual_slx_mps_all,0.024444027503513443,0.005,199,4313,24991,mps_all,Own + matching neighbours
+12,2014Q4,2014,residual_slx_mps_violence,0.02394189934264477,0.005,199,4313,24991,mps_violence,Own + matching neighbours
+12,2014Q4,2014,residual_slx_mps_property,0.024282106798828407,0.005,199,4313,24991,mps_property,Own + matching neighbours
+4,2015Q1,2015,residual_own_mps_all,0.019221727195497678,0.075,199,4281,20350,mps_all,Own crime only
+4,2015Q1,2015,residual_own_mps_violence,0.019223371108581144,0.075,199,4281,20350,mps_violence,Own crime only
+4,2015Q1,2015,residual_own_mps_property,0.01922661094543593,0.075,199,4281,20350,mps_property,Own crime only
+4,2015Q1,2015,residual_slx_mps_all,0.01935618307854111,0.075,199,4281,20350,mps_all,Own + matching neighbours
+4,2015Q1,2015,residual_slx_mps_violence,0.019321509049038312,0.075,199,4281,20350,mps_violence,Own + matching neighbours
+4,2015Q1,2015,residual_slx_mps_property,0.019167508627831325,0.075,199,4281,20350,mps_property,Own + matching neighbours
+8,2015Q1,2015,residual_own_mps_all,0.021450645992808416,0.005,199,4281,20350,mps_all,Own crime only
+8,2015Q1,2015,residual_own_mps_violence,0.02145160129070458,0.005,199,4281,20350,mps_violence,Own crime only
+8,2015Q1,2015,residual_own_mps_property,0.021457071789862957,0.005,199,4281,20350,mps_property,Own crime only
+8,2015Q1,2015,residual_slx_mps_all,0.021641243849395805,0.005,199,4281,20350,mps_all,Own + matching neighbours
+8,2015Q1,2015,residual_slx_mps_violence,0.021667550094687318,0.005,199,4281,20350,mps_violence,Own + matching neighbours
+8,2015Q1,2015,residual_slx_mps_property,0.021399614869310822,0.005,199,4281,20350,mps_property,Own + matching neighbours
+12,2015Q1,2015,residual_own_mps_all,0.023104095726119465,0.01,199,4281,20350,mps_all,Own crime only
+12,2015Q1,2015,residual_own_mps_violence,0.023104784814965675,0.01,199,4281,20350,mps_violence,Own crime only
+12,2015Q1,2015,residual_own_mps_property,0.023107026200022928,0.01,199,4281,20350,mps_property,Own crime only
+12,2015Q1,2015,residual_slx_mps_all,0.023243929524454428,0.01,199,4281,20350,mps_all,Own + matching neighbours
+12,2015Q1,2015,residual_slx_mps_violence,0.023277402371359026,0.01,199,4281,20350,mps_violence,Own + matching neighbours
+12,2015Q1,2015,residual_slx_mps_property,0.02307239560313051,0.01,199,4281,20350,mps_property,Own + matching neighbours
+4,2015Q2,2015,residual_own_mps_all,0.04773363872364965,0.005,199,4258,19929,mps_all,Own crime only
+4,2015Q2,2015,residual_own_mps_violence,0.04773203978528854,0.005,199,4258,19929,mps_violence,Own crime only
+4,2015Q2,2015,residual_own_mps_property,0.04775339298634981,0.005,199,4258,19929,mps_property,Own crime only
+4,2015Q2,2015,residual_slx_mps_all,0.04768811699562591,0.005,199,4258,19929,mps_all,Own + matching neighbours
+4,2015Q2,2015,residual_slx_mps_violence,0.04745266701054486,0.005,199,4258,19929,mps_violence,Own + matching neighbours
+4,2015Q2,2015,residual_slx_mps_property,0.04762543647130549,0.005,199,4258,19929,mps_property,Own + matching neighbours
+8,2015Q2,2015,residual_own_mps_all,0.03959555451296824,0.005,199,4258,19929,mps_all,Own crime only
+8,2015Q2,2015,residual_own_mps_violence,0.03959477379454633,0.005,199,4258,19929,mps_violence,Own crime only
+8,2015Q2,2015,residual_own_mps_property,0.03961481447626785,0.005,199,4258,19929,mps_property,Own crime only
+8,2015Q2,2015,residual_slx_mps_all,0.03947944185341188,0.005,199,4258,19929,mps_all,Own + matching neighbours
+8,2015Q2,2015,residual_slx_mps_violence,0.03914226129435917,0.005,199,4258,19929,mps_violence,Own + matching neighbours
+8,2015Q2,2015,residual_slx_mps_property,0.03947674547564961,0.005,199,4258,19929,mps_property,Own + matching neighbours
+12,2015Q2,2015,residual_own_mps_all,0.04164404760193899,0.005,199,4258,19929,mps_all,Own crime only
+12,2015Q2,2015,residual_own_mps_violence,0.041643276948613105,0.005,199,4258,19929,mps_violence,Own crime only
+12,2015Q2,2015,residual_own_mps_property,0.04166252706568157,0.005,199,4258,19929,mps_property,Own crime only
+12,2015Q2,2015,residual_slx_mps_all,0.04163836865876803,0.005,199,4258,19929,mps_all,Own + matching neighbours
+12,2015Q2,2015,residual_slx_mps_violence,0.04128788889484715,0.005,199,4258,19929,mps_violence,Own + matching neighbours
+12,2015Q2,2015,residual_slx_mps_property,0.041607395681893984,0.005,199,4258,19929,mps_property,Own + matching neighbours

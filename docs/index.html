@@ -51,7 +51,7 @@
   <section class="intro">
     <h1>Crime and housing regression comparison</h1>
     <p>Compare results, explore figures, or browse every exported table. Green means positive; red means negative. Colours indicate direction, not whether a result is desirable.</p>
-    <nav aria-label="Results sections"><a href="#compare">Compare</a><a href="#figures">Figures</a><a href="#outputs">All tables</a></nav>
+    <nav aria-label="Results sections"><a href="#compare">Compare</a><a href="#spatial-appendix">Spatial appendix</a><a href="#figures">Figures</a><a href="#outputs">All tables</a></nav>
   </section>
 
   <section id="compare" class="panel">
@@ -65,6 +65,17 @@
     <p class="note">Standard errors are clustered by LSOA for all main regressions, including the basic specifications. * “Requires IV?” is a conditional endogeneity-test readout; temperature is not a validated instrument. A dash means unavailable; results describe associations unless a valid causal design is established.</p>
   </section>
   <section id="iv-diagnostics" class="panel" hidden><h2>Temperature IV pilot · M7</h2><p id="hausman-summary"></p><p class="note"><b>Temperature is not a validated instrument.</b> The Wooldridge null is that crime is exogenous conditional on a valid instrument and the model's controls. Results use coarse hot-day counts and weather-grid clustered uncertainty. Heat could affect prices directly. Current-year counts include months after some sales.</p><details><summary>Nine M7 endogeneity tests</summary><button type="button" data-copy-table="diagnostic-table">Copy endogeneity table</button><div id="diagnostic-table" class="table-wrap"></div><p class="note">* “Requires IV?” reports whether the test rejects exogeneity at 5%, conditional on temperature being valid. It is not a recommendation to use temperature as an IV. Non-rejection does not prove exogeneity; weak first stages make the diagnostic unreliable.</p></details><details><summary>First-stage and other IV diagnostics</summary><p class="note">Relevance does not establish instrument validity.</p><button type="button" data-copy-table="other-iv-diagnostics">Copy IV diagnostics table</button><div id="other-iv-diagnostics"></div></details></section>
+  <section id="spatial-appendix" class="panel" hidden>
+    <h2>Quarterly spatial autocorrelation · appendix tables</h2>
+    <p class="note">Moran’s I uses complete sale quarters and 4, 8 or 12 neighbours. A star (*) after a Moran value means its permutation p-value is below 0.05; the adjacent column reports that p-value to four decimal places. With 199 permutations, 0.0050 is the smallest possible p-value. Residual p-values are exploratory because the residuals are estimated. The July-only 2015Q3 is excluded. Residuals come from transaction-level own-crime models with LSOA and year-quarter fixed effects, then are averaged within LSOA-quarter. The LSOA count varies by quarter.</p>
+    <p class="note">The earlier residual range 0.077–0.081 (p = 0.005) described an annual aggregated analysis. In these quarterly M7-style diagnostics, residual Moran’s I ranges from −0.0164 to 0.0879. Of 126 crime-type × quarter × neighbour results, 78 are positive with p &lt; 0.05; none of the negative values has p &lt; 0.05.</p>
+    <h3>Crime and price residuals</h3>
+    <div class="output-actions"><button type="button" data-copy-table="spatial-appendix-table" data-copy-label="Copy crime table">Copy crime table</button><a id="spatial-appendix-download" download>Download crime CSV</a></div>
+    <div id="spatial-appendix-table" class="table-wrap"></div>
+    <h3>Mean log house prices</h3>
+    <div class="output-actions"><button type="button" data-copy-table="spatial-price-table" data-copy-label="Copy price table">Copy price table</button><a id="spatial-price-download" download>Download price CSV</a></div>
+    <div id="spatial-price-table" class="table-wrap"></div>
+  </section>
 
   <section class="panel">
     <h2>Explore outputs</h2><div class="filters"><label>Notebook<select id="group"></select></label><label>Search filenames<input id="search" type="search" placeholder="e.g. bootstrap, coverage"></label></div><p id="inventory" role="status"></p>
@@ -76,8 +87,7 @@
 <dialog id="image-dialog" aria-labelledby="image-title"><button id="close-image">Close</button><h2 id="image-title"></h2><img id="large-image" alt=""></dialog>
 <dialog id="table-dialog" aria-labelledby="table-title"><div class="dialog-heading"><h2 id="table-title"></h2><button id="close-table">Close</button></div><div class="filters"><label>Search rows<input id="row-search" type="search"></label><label>Sort by<select id="sort"></select></label><button id="direction">Ascending</button></div><div id="preview" class="table-wrap" aria-live="polite"></div><button id="prev">Previous</button> <span id="page"></span> <button id="next">Next</button></dialog>
 <dialog id="coeff-dialog" aria-labelledby="coeff-title"><div class="dialog-heading"><h2 id="coeff-title"></h2><div><button id="copy-coeff" class="copy-icon" aria-label="Copy table" title="Copy table"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="13" height="13" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button><button id="close-coeff">Close</button></div></div><div id="coeff-content" class="table-wrap"></div></dialog>
-<dialog id="table-dialog" aria-labelledby="table-title"><div class="dialog-heading"><h2 id="table-title"></h2><button id="close-table">Close</button></div><div class="filters"><label>Search rows<input id="row-search" type="search"></label><label>Sort by<select id="sort"></select></label><button id="direction">Ascending</button></div><div id="preview" class="table-wrap" aria-live="polite"></div><button id="prev">Previous</button> <span id="page"></span> <button id="next">Next</button></dialog>
-<script src="explorer.js?v=78d46a729a54b0db"></script>
+<script src="explorer.js?v=e34faddab998cc04"></script>
 
 </body>
 </html>

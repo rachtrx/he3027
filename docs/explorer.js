@@ -145,7 +145,7 @@ function renderCompare(){
  $('comparison').scrollLeft=scroll;
  writeSharedSelection();
  if($('coeff-dialog').open)renderFullCoefficients(activeCoeffIndex);
- $('context').textContent='Cross-analysis comparisons are descriptive: notebook 08 repeats original crime models on common 2012–2014 and 2012–2013 sale samples; temperature IV targets the three MPS crime types under M7; quantiles target conditional price percentiles; spatial SLX uses individual sales; Moran statistics use LSOA-year summaries. Heat may affect prices directly. Check the sample, timing and fixed effects in each column. M1 has no crime coefficient.';
+ $('context').textContent='Cross-analysis comparisons are descriptive: notebook 08 repeats original crime models on common 2012–2014 and 2012–2013 sale samples; temperature IV targets the three MPS crime types under M7; quantiles target conditional price percentiles; spatial SLX uses individual sales. Quarterly Moran statistics use LSOA-quarter averages from the same spatial transaction sample; residuals originate in transaction-level LSOA and year-quarter fixed-effects models. Heat may affect prices directly. Check the sample, timing and fixed effects in each column. M1 has no crime coefficient.';
 }
 function matches(item){return(!$('group').value||item.group===$('group').value)&&(`${item.title} ${item.group}`.toLowerCase().includes($('search').value.toLowerCase()));}
 function browse(){
@@ -163,6 +163,22 @@ function renderTable(){
  $('page').textContent=`${rows.length? page*50+1:0}–${Math.min((page+1)*50,rows.length)} of ${rows.length}`;
  $('prev').disabled=page===0;$('next').disabled=(page+1)*50>=rows.length;
 }
+async function renderSpatialAppendix(){
+ const files=[
+  ['moran_diagnostics_crime_formatted.csv','spatial-appendix-table','spatial-appendix-download'],
+  ['moran_diagnostics_price_formatted.csv','spatial-price-table','spatial-price-download']
+ ];
+ for(const [filename,tableId,downloadId] of files){
+  const file=catalog.files.find(f=>f.id===`06_crime_spatial_outputs/${filename}`);
+  if(!file)return;
+  const response=await fetch(url(file.json));
+  if(!response.ok)throw Error(`HTTP ${response.status}`);
+  const data=await response.json();
+  $(tableId).innerHTML=table(data.columns,data.rows.map(row=>data.columns.map(key=>cell(row[key],key))));
+  $(downloadId).href=url(file.url);
+ }
+ $('spatial-appendix').hidden=false;
+}
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
  if(b.dataset.copyTable){
@@ -173,7 +189,7 @@ document.addEventListener('click',async e=>{
   let copied=false;
   try{await navigator.clipboard.write([new ClipboardItem({'text/html':new Blob([html],{type:'text/html'}),'text/plain':new Blob([plain],{type:'text/plain'})})]);copied=true;}
   catch{const area=document.createElement('div');area.contentEditable='true';area.style.position='fixed';area.style.left='-10000px';area.innerHTML=html;document.body.append(area);const range=document.createRange();range.selectNodeContents(area);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);copied=document.execCommand('copy');selection.removeAllRanges();area.remove();}
-  b.textContent=copied?'Copied table':'Copy failed';setTimeout(()=>{b.textContent=b.dataset.copyTable==='diagnostic-table'?'Copy endogeneity table':'Copy IV diagnostics table';},1800);return;
+  b.textContent=copied?'Copied table':'Copy failed';setTimeout(()=>{b.textContent=b.dataset.copyLabel|| (b.dataset.copyTable==='diagnostic-table'?'Copy endogeneity table':'Copy IV diagnostics table');},1800);return;
  }
  if(b.id==='reset-comparison'){selected=defaultPreset().map(r=>r.id);renderCompare();return;}
  if(b.dataset.shortcut){applyShortcut(b);return;}
@@ -215,4 +231,4 @@ for(const id of ['image-dialog','table-dialog']){
 }
 $('table-dialog').addEventListener('close',()=>{request++;});
 $('row-search').oninput=()=>{page=0;renderTable();};$('sort').onchange=()=>{sortKey=$('sort').value;renderTable();};$('direction').onclick=()=>{ascending=!ascending;$('direction').textContent=ascending?'Ascending':'Descending';renderTable();};$('prev').onclick=()=>{page--;renderTable();};$('next').onclick=()=>{page++;renderTable();};
-fetch('generated/catalog.json').then(r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();}).then(data=>{catalog=data;$('group').innerHTML='<option value="">All notebooks</option>'+data.groups.map(g=>`<option value="${esc(g.id)}">${esc(g.label)}</option>`).join('');prepareComparisons();browse();$('status').textContent=`Built ${new Date(data.built_at).toLocaleString()} · ${data.files.length} outputs. Build time is not notebook execution time.`;}).catch(e=>{$('status').textContent=`Could not load results: ${e.message}`;});
+fetch('generated/catalog.json').then(r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();}).then(data=>{catalog=data;$('group').innerHTML='<option value="">All notebooks</option>'+data.groups.map(g=>`<option value="${esc(g.id)}">${esc(g.label)}</option>`).join('');prepareComparisons();browse();renderSpatialAppendix().catch(e=>{$('spatial-appendix-table').textContent=`Could not load appendix table: ${e.message}`;$('spatial-appendix').hidden=false;});$('status').textContent=`Built ${new Date(data.built_at).toLocaleString()} · ${data.files.length} outputs. Build time is not notebook execution time.`;}).catch(e=>{$('status').textContent=`Could not load results: ${e.message}`;});
