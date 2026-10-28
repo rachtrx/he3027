@@ -34,6 +34,7 @@ def value(text):
 def build():
     DEST.mkdir(parents=True, exist_ok=True)
     files, groups, families, diagnostics, coefficient_tables = [], [], [], [], []
+    baseline_iv_diagnostics = []
     main = []
     # Only folders designated as notebook outputs are published.
     for folder in sorted((ROOT / 'data').glob('*outputs')):
@@ -45,6 +46,11 @@ def build():
         groups.append(group)
         for path in sorted(folder.rglob('*')):
             if not path.is_file() or path.is_symlink() or path.suffix.lower() not in ('.csv', '.png', '.jpg', '.jpeg', '.webp', '.gif'):
+                continue
+            if folder.name == '04_crime_iv_outputs' and path.name == 'temperature_m7_diagnostics.csv':
+                with path.open(encoding='utf-8-sig', newline='') as handle:
+                    baseline_iv_diagnostics = [dict({k: value(v) for k, v in row.items()}, threshold_c=25)
+                                               for row in csv.DictReader(handle) if row['exposure'] == 'prior12']
                 continue
             if folder.name == '04_crime_iv_outputs' and path.name not in {
                 'temperature_m7_violent_prior12_thresholds.csv',
@@ -101,9 +107,9 @@ def build():
                 elif folder.name == '11_crime_mps_change_outputs' and path.stem == 'm7_crime_change_regressions':
                     selected = [dict(r, method='OLS', data_source='MPS',
                                      exposure_label=('Prior 12 months' if r['specification'] == 'recent_level'
-                                                     else 'Year-on-year change'))
+                                                     else 'Δ log crime'))
                                 for r in rows if r['specification'] in {'recent_level', 'year_on_year_change'}]
-                    families.append(dict(id=item['id'], label='M7 MPS crime level versus change · common sales',
+                    families.append(dict(id=item['id'], label='M7 MPS crime level versus Δ log crime · common sales',
                                          columns=list(dict.fromkeys(columns + ['method', 'data_source', 'exposure_label'])),
                                          rows=[dict(r, id=str(i)) for i, r in enumerate(selected)]))
                 elif {'beta','N'} <= set(columns) and 'variable' not in columns and any(c in columns for c in ['method','quantile','specification']):
@@ -137,7 +143,8 @@ def build():
             attach_coefficients(regression, regression['_group'])
         families.insert(0,dict(id='main',label='Main regressions · shared model',rows=list(unique.values()),
                                columns=list(dict.fromkeys(k for r in unique.values() for k in r if k!='id'))))
-    catalog = dict(built_at=datetime.now(timezone.utc).isoformat(),groups=groups,files=files,families=families,diagnostics=diagnostics)
+    catalog = dict(built_at=datetime.now(timezone.utc).isoformat(),groups=groups,files=files,families=families,
+                   diagnostics=diagnostics,baseline_iv_diagnostics=baseline_iv_diagnostics)
     (DEST/'catalog.json').write_text(json.dumps(catalog,allow_nan=False),encoding='utf-8')
     script = ROOT / 'docs' / 'explorer.js'
     page = ROOT / 'docs' / 'index.html'
