@@ -17,6 +17,7 @@ from utils import temperature_iv_m7
 
 DAILY = base.SOURCE / "open_meteo_daily_max_2011_2015.csv.gz"
 RESULT = base.OUT / "temperature_m7_threshold_sensitivity.csv"
+FOCUS = base.OUT / "temperature_m7_violent_prior12_thresholds.csv"
 THRESHOLDS = (20, 22, 25, 27)
 KEYS = ["weather_lat", "weather_lon"]
 
@@ -85,6 +86,9 @@ def main() -> None:
                 pd.DataFrame(rows).to_csv(RESULT, index=False)
     summary = pd.DataFrame(rows).sort_values(["threshold_c", "crime", "exposure"])
     summary.to_csv(RESULT, index=False)
+    focus = summary.loc[summary.crime.eq("violentcrime") & summary.exposure.eq("prior12")]
+    if set(focus.threshold_c) == set(THRESHOLDS) and len(focus) == len(THRESHOLDS):
+        focus.to_csv(FOCUS, index=False)
     print(summary[["threshold_c", "crime", "exposure", "N",
                    "first_stage_F_weather_cell", "partial_R2", "iv_beta",
                    "iv_ci_low", "iv_ci_high"]].to_string(index=False))

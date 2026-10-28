@@ -30,7 +30,7 @@ function rowLabel(r){
  const estimator=r.method==='2SLS'?'IV':r.method||r.estimator||(r.quantile!=null?'Quantile':r._family==='Spatial regressions'?'Spatial':'OLS');
  const model=r.model||r.specification||(r.quantile!=null?`Q${Number((r.quantile*100).toFixed(2))}`:'Model unspecified');
  const sample=r._group==='08_crime_original_robustness_outputs'?(String(r.panel).startsWith('pre2014')?'2012–2013 sales':'2012–2014 sales'):r._family==='Crime exposure windows'?'April 2013–2015 sales':null;
- return [model,estimator,data,sample,time,crime,r.quantile!=null&&r.specification?`Q${r.quantile*100}`:null,r.k!=null?`${r.k} neighbours`:null].filter(Boolean).join(' · ');
+ return [model,estimator,data,sample,time,crime,r.threshold_c!=null?`${r.threshold_c}°C`:null,r.quantile!=null&&r.specification?`Q${r.quantile*100}`:null,r.k!=null?`${r.k} neighbours`:null].filter(Boolean).join(' · ');
 }
 function renderFullCoefficients(index){
  activeCoeffIndex=index;
@@ -51,14 +51,14 @@ function prepareComparisons(){
   const iv=family.columns.includes('first_stage_wald_F')||family.rows.some(r=>r.method==='2SLS');
   for(const row of family.rows){
    if(iv&&!['2SLS','OLS','TWFE'].includes(row.method)){diagnostics.push({...row,analysis:family.label});continue;}
-   const identity=JSON.stringify([family.id==='main'?'main':family.id.split('/')[0],...['model','panel','specification','method','crime','quantile','k','N','beta'].map(k=>row[k]??null),timingOf(row)]);
+   const identity=JSON.stringify([family.id==='main'?'main':family.id.split('/')[0],...['model','panel','specification','method','crime','quantile','k','N','beta','threshold_c'].map(k=>row[k]??null),timingOf(row)]);
    const interaction=String(row.method||'').startsWith('Crime ×')||row.interaction_beta!=null;
-   const candidate={...row,id:identity,_iv:iv,_family:row._group==='08_crime_original_robustness_outputs'?'Original crime · restricted years':family.id==='main'?'Main regressions':family.id.startsWith('10_crime_mps_exposure_windows_outputs/')?'Crime exposure windows':interaction?'Interaction regressions':iv?'IV and matched OLS/TWFE':row.quantile!=null?'Quantile regressions':'Spatial regressions',analysis:family.label};
+   const candidate={...row,id:identity,_iv:iv,_family:row._group==='08_crime_original_robustness_outputs'?'Original crime · restricted years':family.id==='main'?'Main regressions':family.id.startsWith('10_crime_mps_exposure_windows_outputs/')?'Crime exposure windows':family.id.startsWith('11_crime_mps_change_outputs/')?'Crime change':interaction?'Interaction regressions':iv?'Temperature IV · prior12 violence':row.quantile!=null?'Quantile regressions':'Spatial regressions',analysis:family.label};
    const previous=unique.get(identity);
    if(!previous||Object.keys(row).length>Object.keys(previous).length-4)unique.set(identity,candidate);
   }
  }
- const order=['Main regressions','Crime exposure windows','Original crime · restricted years','Interaction regressions','IV and matched OLS/TWFE','Quantile regressions','Spatial regressions'];
+ const order=['Main regressions','Crime exposure windows','Crime change','Original crime · restricted years','Interaction regressions','Temperature IV · prior12 violence','Quantile regressions','Spatial regressions'];
  pool=[...unique.values()].sort((a,b)=>order.indexOf(a._family)-order.indexOf(b._family));
  renderShortcuts();
  const shared=decodeSharedSelection();
@@ -66,15 +66,18 @@ function prepareComparisons(){
  selected=validShared.length?validShared:defaultPreset().map(r=>r.id);
  if(selected.length<2)selected.push(...pool.filter(r=>!selected.includes(r.id)).slice(0,2-selected.length).map(r=>r.id));
  renderCompare();
- const fields=['analysis','exposure','specification','method','beta','se','ci_low','ci_high','first_stage_wald_F','partial_R2','AR_95_set'];
- $('diagnostic-table').innerHTML=diagnostics.length?table(fields.map(name),diagnostics.map(r=>fields.map(k=>cell(r[k],k)))):'No IV diagnostics available.';
  const tests=(catalog.diagnostics||[]).flatMap(x=>x.rows);
- const detailRows=tests.map(r=>{const weak=Number(r.first_stage_wald_F)<10;const verdict=r.reject_exogeneity_5pct?'Reject exogeneity H₀':'Do not reject H₀';return[esc(r.model||r.specification),esc(crimeLabel(r)),esc(timingLabel(r)),fmt(r.clustered_wooldridge_chi2),fmt(r.clustered_wooldridge_p,'p-value'),verdict+(weak?' · weak first stage':''),r.reject_exogeneity_5pct?'Yes*':'No*',fmt(r.first_stage_wald_F),fmt(r.partial_R2),fmt(r.N),fmt(r.clusters)];});
- $('hausman-summary').textContent=tests.length?`${tests.filter(r=>r.reject_exogeneity_5pct).length} of ${tests.length} M7 tests reject the exogeneity null at 5%, conditional on a valid instrument. Weak first stages cannot diagnose endogeneity reliably.`:'No exported endogeneity tests found.';
- $('diagnostic-table').innerHTML=tests.length?table(['Model','Crime','Timing','Wooldridge χ²','p-value','Conditional test result','Requires IV?*','Weather-cell first-stage F','Partial R²','N','Weather cells'],detailRows):'No exported endogeneity tests found.';
- const auxiliary=catalog.families.flatMap(f=>f.rows).filter(r=>r.first_stage_wald_F!=null||['First stage','Reduced form'].includes(r.method));
- const auxCols=['exposure','specification','method','beta','se','ci_low','ci_high','p','first_stage_wald_F','partial_R2','AR_95_set'];
- $('other-iv-diagnostics').innerHTML=auxiliary.length?table(auxCols.map(name),auxiliary.map(r=>auxCols.map(k=>cell(r[k],k)))):'No additional IV diagnostics found.';
+ const detailRows=tests.map(r=>{const p=r.wooldridge_exogeneity_p;const reject=p<.05;const weak=Number(r.first_stage_wald_F)<10;return[`${fmt(r.threshold_c)}°C`,fmt(r.wooldridge_exogeneity_chi2),fmt(p,'p-value'),reject?'Reject exogeneity H₀':'Do not reject H₀',reject?'Yes*':'No*',fmt(r.first_stage_wald_F),weak?'Yes':'No',fmt(r.partial_R2)];});
+ $('hausman-summary').textContent=tests.length?`${tests.filter(r=>r.wooldridge_exogeneity_p<.05).length} of ${tests.length} conditional exogeneity tests reject at 5%. Weak first stages make this diagnostic unreliable.`:'No focused endogeneity tests found.';
+ $('diagnostic-table').innerHTML=tests.length?table(['Threshold','Wooldridge χ²','p-value','Conditional test result','Requires IV?*','First-stage F','F below 10?','Partial R²'],detailRows):'No focused endogeneity tests found.';
+ const auxiliary=catalog.families.flatMap(f=>f.rows).filter(r=>r.threshold_c!=null&&r.crime==='violentcrime'&&r.exposure==='prior12').sort((a,b)=>a.threshold_c-b.threshold_c);
+ const auxCols=['threshold_c','beta','se','ci_low','ci_high','p','first_stage_wald_F','partial_R2'];
+ const auxNames=['Threshold (°C)','2SLS β','SE','95% CI lower','95% CI upper','p-value','First-stage F','Partial R²'];
+ $('other-iv-diagnostics').innerHTML=auxiliary.length?table(auxNames,auxiliary.map(r=>auxCols.map(k=>cell(r[k],k)))):'No focused IV results found.';
+ const focus=catalog.files.find(f=>f.id==='04_crime_iv_outputs/temperature_m7_violent_prior12_thresholds.csv');
+ const figure=catalog.files.find(f=>f.id==='04_crime_iv_outputs/temperature_m7_threshold_violent_prior12_iv.png');
+ if(focus)$('iv-download').href=url(focus.url);
+ if(figure)$('iv-threshold-figure').innerHTML=`<button class="image-button" data-open="${esc(figure.id)}" aria-label="Enlarge ${esc(figure.title)}"><img src="${url(figure.url)}" alt="Violent-crime prior12 IV estimates by temperature threshold"></button>`;
 }
 function shortcutRows(predicate,source='Original Stata'){
  const matches=pool.filter(r=>r._family==='Main regressions'&&!r._iv&&/^M[2-7]$/i.test(r.model||'')&&sourceOf(r)===source&&predicate(r));
@@ -134,9 +137,9 @@ function renderCompare(){
    return fmt(main?.beta);
   }
   if(k==='requires_iv'){
-   if(sourceOf(r)!=='MPS'||(!r._iv&&r._family!=='Main regressions'))return '—';
-   const test=(catalog.diagnostics||[]).flatMap(d=>d.rows).find(t=>t.model===r.model&&crimeLabel(t)===crimeLabel(r)&&timingLabel(t)===timingLabel(r));
-   return test?(test.reject_exogeneity_5pct?'Yes*':'No*'):'—';
+   if(!r._iv||r.threshold_c==null)return '—';
+   const test=(catalog.diagnostics||[]).flatMap(d=>d.rows).find(t=>t.threshold_c===r.threshold_c&&t.crime===r.crime&&t.exposure===r.exposure);
+   return test?(test.wooldridge_exogeneity_p<.05?'Yes*':'No*'):'—';
   }
   return fmt(r[k],k);
  };
@@ -145,7 +148,7 @@ function renderCompare(){
  $('comparison').scrollLeft=scroll;
  writeSharedSelection();
  if($('coeff-dialog').open)renderFullCoefficients(activeCoeffIndex);
- $('context').textContent='Cross-analysis comparisons are descriptive: notebook 08 repeats original crime models on common 2012–2014 and 2012–2013 sale samples; temperature IV targets the three MPS crime types under M7; quantiles target conditional price percentiles; spatial SLX uses individual sales. Quarterly Moran statistics use LSOA-quarter averages from the same spatial transaction sample; residuals originate in transaction-level LSOA and year-quarter fixed-effects models. Heat may affect prices directly. Check the sample, timing and fixed effects in each column. M1 has no crime coefficient.';
+ $('context').textContent='Cross-analysis comparisons are descriptive: notebook 08 repeats original crime models on restricted years; notebook 10 compares MPS crime exposure windows on common sales; notebook 11 compares crime levels and year-on-year changes. The displayed temperature IV models target only prior-12-month violent crime at four cutoffs. Quantiles and spatial SLX use different designs. Heat may affect prices directly. Check the sample, timing and fixed effects in each column. M1 has no crime coefficient.';
 }
 function matches(item){return(!$('group').value||item.group===$('group').value)&&(`${item.title} ${item.group}`.toLowerCase().includes($('search').value.toLowerCase()));}
 function browse(){
@@ -179,24 +182,27 @@ async function renderSpatialAppendix(){
  }
  $('spatial-appendix').hidden=false;
 }
-async function renderLongWindows(){
- const group='10_crime_mps_exposure_windows_outputs';
- const csv=catalog.files.find(f=>f.id===`${group}/m7_prior6_prior12_prior24_prior36_common_sample.csv`);
- const figure=catalog.files.find(f=>f.id===`${group}/m7_prior6_prior12_prior24_prior36_common_sample.png`);
- if(!csv||!figure)return;
- const response=await fetch(url(csv.json));
- if(!response.ok)throw Error(`HTTP ${response.status}`);
- const data=await response.json();
+async function renderCrimeChange(){
+ const group='11_crime_mps_change_outputs';
+ const csv=catalog.files.find(f=>f.id===`${group}/m7_crime_change_regressions.csv`);
+ const tests=catalog.files.find(f=>f.id===`${group}/m7_change_restriction_tests.csv`);
+ const figure=catalog.files.find(f=>f.id===`${group}/m7_crime_change_vs_level.png`);
+ if(!csv||!tests||!figure)return;
+ const responses=await Promise.all([csv,tests].map(f=>fetch(url(f.json))));
+ if(responses.some(r=>!r.ok))throw Error('Could not load crime change tables');
+ const [data,restrictions]=await Promise.all(responses.map(r=>r.json()));
  const crimeOrder=['mps_all','mps_violence','mps_property'];
- const windowOrder=['prior6','prior12','prior24','prior36'];
- const rows=[...data.rows].sort((a,b)=>crimeOrder.indexOf(a.crime)-crimeOrder.indexOf(b.crime)||windowOrder.indexOf(a.exposure)-windowOrder.indexOf(b.exposure));
- $('long-windows-table').innerHTML=table(
-  ['Crime','Exposure','Coefficient β','95% CI','p-value','β × partial crime SD','Sales'],
-  rows.map(r=>[esc(crimeLabel(r)),esc(timingLabel(r)),cell(r.beta,'beta'),
-    `${fmt(r.ci_low)} to ${fmt(r.ci_high)}`,fmt(r.p,'p'),fmt(r.beta_per_partial_crime_sd),fmt(r.N)]));
- $('long-windows-download').href=url(csv.url);
- $('long-windows-figure').innerHTML=`<button class="image-button" data-open="${esc(figure.id)}" aria-label="Enlarge ${esc(figure.title)}"><img src="${url(figure.url)}" alt="M7 coefficient estimates and 95% confidence intervals for 6, 12, 24 and 36 months of MPS crime"></button><a href="${url(figure.url)}" download>Download figure</a>`;
- $('long-windows').hidden=false;
+ const specOrder=['recent_level','year_on_year_change'];
+ const rows=data.rows.filter(r=>specOrder.includes(r.specification)).sort((a,b)=>crimeOrder.indexOf(a.crime)-crimeOrder.indexOf(b.crime)||specOrder.indexOf(a.specification)-specOrder.indexOf(b.specification));
+ $('crime-change-table').innerHTML=table(
+  ['Crime','Measure','Coefficient β','95% CI','p-value','Sales'],
+  rows.map(r=>[esc(crimeLabel(r)),r.specification==='recent_level'?'Recent 12-month level':'Year-on-year change',cell(r.beta,'beta'),`${fmt(r.ci_low)} to ${fmt(r.ci_high)}`,fmt(r.p,'p'),fmt(r.N)]));
+ $('crime-change-two-level').innerHTML=table(
+  ['Crime','Recent-year β','Preceding-year β','Equal-and-opposite test p'],
+  restrictions.rows.sort((a,b)=>crimeOrder.indexOf(a.crime)-crimeOrder.indexOf(b.crime)).map(r=>[esc(crimeLabel(r)),fmt(r.recent_beta),fmt(r.preceding_beta),fmt(r.equal_opposite_p,'p')]));
+ $('crime-change-download').href=url(csv.url);
+ $('crime-change-figure').innerHTML=`<button class="image-button" data-open="${esc(figure.id)}" aria-label="Enlarge ${esc(figure.title)}"><img src="${url(figure.url)}" alt="M7 crime level and year-on-year change coefficients with confidence intervals"></button>`;
+ $('crime-change').hidden=false;
 }
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
@@ -250,4 +256,4 @@ for(const id of ['image-dialog','table-dialog']){
 }
 $('table-dialog').addEventListener('close',()=>{request++;});
 $('row-search').oninput=()=>{page=0;renderTable();};$('sort').onchange=()=>{sortKey=$('sort').value;renderTable();};$('direction').onclick=()=>{ascending=!ascending;$('direction').textContent=ascending?'Ascending':'Descending';renderTable();};$('prev').onclick=()=>{page--;renderTable();};$('next').onclick=()=>{page++;renderTable();};
-fetch('generated/catalog.json').then(r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();}).then(data=>{catalog=data;$('group').innerHTML='<option value="">All notebooks</option>'+data.groups.map(g=>`<option value="${esc(g.id)}">${esc(g.label)}</option>`).join('');prepareComparisons();browse();renderLongWindows().catch(e=>{$('long-windows-table').textContent=`Could not load comparison: ${e.message}`;$('long-windows').hidden=false;});renderSpatialAppendix().catch(e=>{$('spatial-appendix-table').textContent=`Could not load appendix table: ${e.message}`;$('spatial-appendix').hidden=false;});$('status').textContent=`Built ${new Date(data.built_at).toLocaleString()} · ${data.files.length} outputs. Build time is not notebook execution time.`;}).catch(e=>{$('status').textContent=`Could not load results: ${e.message}`;});
+fetch('generated/catalog.json').then(r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();}).then(data=>{catalog=data;$('group').innerHTML='<option value="">All notebooks</option>'+data.groups.map(g=>`<option value="${esc(g.id)}">${esc(g.label)}</option>`).join('');prepareComparisons();browse();renderCrimeChange().catch(e=>{$('crime-change-table').textContent=`Could not load crime change results: ${e.message}`;$('crime-change').hidden=false;});renderSpatialAppendix().catch(e=>{$('spatial-appendix-table').textContent=`Could not load appendix table: ${e.message}`;$('spatial-appendix').hidden=false;});$('status').textContent=`Built ${new Date(data.built_at).toLocaleString()} · ${data.files.length} outputs. Build time is not notebook execution time.`;}).catch(e=>{$('status').textContent=`Could not load results: ${e.message}`;});

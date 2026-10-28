@@ -46,6 +46,11 @@ def build():
         for path in sorted(folder.rglob('*')):
             if not path.is_file() or path.is_symlink() or path.suffix.lower() not in ('.csv', '.png', '.jpg', '.jpeg', '.webp', '.gif'):
                 continue
+            if folder.name == '04_crime_iv_outputs' and path.name not in {
+                'temperature_m7_violent_prior12_thresholds.csv',
+                'temperature_m7_threshold_violent_prior12_iv.png',
+            }:
+                continue
             relative = path.relative_to(ROOT / 'data')
             target = DEST / relative
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -69,9 +74,7 @@ def build():
                 json_target = target.with_suffix('.json')
                 json_target.write_text(json.dumps(dict(columns=columns, rows=rows), allow_nan=False), encoding='utf-8')
                 item.update(columns=columns, rows=len(rows), json=url[:-4]+'.json')
-                if path.name == 'temperature_m7_endogeneity_tests.csv':
-                    diagnostics.append(dict(title=group['label'] + ' · Endogeneity tests', columns=columns, rows=rows))
-                if {'variable', 'beta'} <= set(columns):
+                if {'variable', 'beta'} <= set(columns) and path.name != 'm7_crime_change_regressions.csv':
                     coefficient_tables.append(dict(group=folder.name, columns=columns, rows=rows, title=item['title']))
                 # Identify statistical summaries by schema, not filename.
                 robustness_summary = folder.name != '08_crime_original_robustness_outputs' or path.stem in {'combined_primary_models', 'combined_2012_2013_models'}
@@ -79,10 +82,31 @@ def build():
                     for row in rows:
                         key = json.dumps([folder.name,row],sort_keys=True)
                         main.append(dict(row, id=hashlib.sha256(key.encode()).hexdigest()[:20], source=group['label'], output=item['title'], _group=folder.name))
+                elif folder.name == '04_crime_iv_outputs' and path.stem == 'temperature_m7_violent_prior12_thresholds':
+                    focused = [dict(r, beta=r['iv_beta'], se=r['iv_se'], p=r['iv_p'],
+                                    ci_low=r['iv_ci_low'], ci_high=r['iv_ci_high'],
+                                    clusters=r['weather_cell_clusters'],
+                                    first_stage_wald_F=r['first_stage_F_weather_cell'],
+                                    method='2SLS', data_source='MPS') for r in rows]
+                    families.append(dict(id=item['id'], label='M7 violent crime · prior 12 months · temperature IV',
+                                         columns=list(dict.fromkeys(columns + ['beta', 'se', 'p', 'ci_low', 'ci_high',
+                                                                              'clusters', 'first_stage_wald_F',
+                                                                              'method', 'data_source'])),
+                                         rows=[dict(r, id=str(i)) for i, r in enumerate(focused)]))
+                    diagnostics.append(dict(title='Violent crime · prior 12 months · temperature IV',
+                                            columns=columns, rows=focused))
                 elif folder.name == '10_crime_mps_exposure_windows_outputs' and path.stem == 'm7_prior6_prior12_prior24_prior36_common_sample':
                     families.append(dict(id=item['id'], label='M7 MPS crime windows · common April 2013–2015 sales',
                                          columns=columns, rows=[dict(r,id=str(i)) for i,r in enumerate(rows)]))
-                elif {'beta','N'} <= set(columns) and 'variable' not in columns and any(c in columns for c in ['method','quantile','specification']) and (folder.name != '04_crime_iv_outputs' or path.stem == 'temperature_m7_regressions'):
+                elif folder.name == '11_crime_mps_change_outputs' and path.stem == 'm7_crime_change_regressions':
+                    selected = [dict(r, method='OLS', data_source='MPS',
+                                     exposure_label=('Prior 12 months' if r['specification'] == 'recent_level'
+                                                     else 'Year-on-year change'))
+                                for r in rows if r['specification'] in {'recent_level', 'year_on_year_change'}]
+                    families.append(dict(id=item['id'], label='M7 MPS crime level versus change · common sales',
+                                         columns=list(dict.fromkeys(columns + ['method', 'data_source', 'exposure_label'])),
+                                         rows=[dict(r, id=str(i)) for i, r in enumerate(selected)]))
+                elif {'beta','N'} <= set(columns) and 'variable' not in columns and any(c in columns for c in ['method','quantile','specification']):
                     families.append(dict(id=item['id'], label=group['label']+' · '+item['title'], columns=columns,
                                          rows=[dict(r,id=str(i)) for i,r in enumerate(rows)]))
             files.append(item)

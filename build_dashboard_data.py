@@ -92,7 +92,7 @@ def main():
     OUT.parent.mkdir(parents=True, exist_ok=True)
     extensions = []
     for title, folder, filename, columns, note in [
-        ('04 · Temperature IV pilot · M7', '04_crime_iv_outputs', 'temperature_m7_regressions.csv', [], 'MPS crime under M7, instrumented with coarse hot-day counts. Heat may affect prices directly; estimates are exploratory.'),
+        ('04 · Violent crime prior12 · temperature IV', '04_crime_iv_outputs', 'temperature_m7_violent_prior12_thresholds.csv', [], 'M7 violent-crime prior12 IV at 20°C, 22°C, 25°C and 27°C. Heat may affect prices directly; estimates are exploratory.'),
         ('05 · Price quantiles', '05_crime_quantile_outputs', 'quantile_points.csv', ['crime', 'quantile', 'beta', 'ci_low', 'ci_high', 'N'], 'Conditional quantile estimates use a reproducible sample and clustered bootstrap intervals.'),
         ('06 · Neighbourhood effects', '06_crime_spatial_outputs', 'spatial_regressions.csv', ['specification', 'k', 'crime', 'beta', 'se', 'ci_low', 'ci_high', 'N'], 'Transaction-level regressions use sale-month prior12 own and neighbouring crime, LSOA and year-quarter effects. The reported beta is own-area crime.'),
         ('06 · Quarterly spatial clustering', '06_crime_spatial_outputs', 'moran_diagnostics.csv', [], "Quarterly crime Moran's I; parentheses show Moran's I of the corresponding transaction-level own-crime price residuals averaged within LSOA-quarter. Residual permutation tests are exploratory."),
