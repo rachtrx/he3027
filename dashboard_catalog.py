@@ -79,6 +79,9 @@ def build():
                     for row in rows:
                         key = json.dumps([folder.name,row],sort_keys=True)
                         main.append(dict(row, id=hashlib.sha256(key.encode()).hexdigest()[:20], source=group['label'], output=item['title'], _group=folder.name))
+                elif folder.name == '10_crime_mps_exposure_windows_outputs' and path.stem == 'm7_prior6_prior12_prior24_prior36_common_sample':
+                    families.append(dict(id=item['id'], label='M7 MPS crime windows · common April 2013–2015 sales',
+                                         columns=columns, rows=[dict(r,id=str(i)) for i,r in enumerate(rows)]))
                 elif {'beta','N'} <= set(columns) and 'variable' not in columns and any(c in columns for c in ['method','quantile','specification']) and (folder.name != '04_crime_iv_outputs' or path.stem == 'temperature_m7_regressions'):
                     families.append(dict(id=item['id'], label=group['label']+' · '+item['title'], columns=columns,
                                          rows=[dict(r,id=str(i)) for i,r in enumerate(rows)]))

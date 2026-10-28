@@ -9,7 +9,7 @@ const table=(heads,rows)=>`<table><thead><tr>${heads.map(h=>`<th scope="col">${e
 const hatSymbol=(letter,label)=>`<span class="math-hat" role="img" aria-label="${label}"><span>${letter}</span><span class="hat-accent" aria-hidden="true">ˆ</span></span>`;
 let catalog, pool=[], diagnostics=[], selected=[], activeCoeffIndex=0, loaded=null, page=0, sortKey=null, ascending=true, request=0;
 const timingOf=r=>r.exposure_label||r.crime_exposure||r.exposure||r.timing||null;
-const timingLabel=r=>{const t=timingOf(r);return ({lagyear:'Previous year','previous-year':'Previous year','current-year':'Annual',prior12:'Prior 12 months',annual:'Annual',none:'Not applicable'})[t]||t||'Not specified';};
+const timingLabel=r=>{const t=timingOf(r);return ({lagyear:'Previous year','previous-year':'Previous year','current-year':'Annual',prior6:'Prior 6 months',prior12:'Prior 12 months',prior24:'Prior 24 months',prior36:'Prior 36 months',annual:'Annual',none:'Not applicable'})[t]||t||'Not specified';};
 const sourceOf=r=>{const source=r.data_source||((String(r.crime||'').startsWith('mps_')||r._iv||/\bmps\b/i.test(r.source||''))?'MPS':r.model||r.specification?'Original Stata':r.source||'Source unspecified');return /mps/i.test(source)?'MPS':/stata|original/i.test(source)?'Original Stata':source;};
 const crimeLabel=r=>({allcrime:'All crime',mps_all:'All crime',violentcrime:'Violence',violent_crime:'Violence',mps_violence:'Violence',propertycrime:'Property crime',mps_property:'Property crime'})[r.crime]||r.crime||'Crime unspecified';
 const modelOrder=(a,b)=>Number(String(a.model||'').replace(/^M/i,''))-Number(String(b.model||'').replace(/^M/i,''));
@@ -29,7 +29,7 @@ function rowLabel(r){
  const time=timingLabel(r);
  const estimator=r.method==='2SLS'?'IV':r.method||r.estimator||(r.quantile!=null?'Quantile':r._family==='Spatial regressions'?'Spatial':'OLS');
  const model=r.model||r.specification||(r.quantile!=null?`Q${Number((r.quantile*100).toFixed(2))}`:'Model unspecified');
- const sample=r._group==='08_crime_original_robustness_outputs'?(String(r.panel).startsWith('pre2014')?'2012–2013 sales':'2012–2014 sales'):null;
+ const sample=r._group==='08_crime_original_robustness_outputs'?(String(r.panel).startsWith('pre2014')?'2012–2013 sales':'2012–2014 sales'):r._family==='Crime exposure windows'?'April 2013–2015 sales':null;
  return [model,estimator,data,sample,time,crime,r.quantile!=null&&r.specification?`Q${r.quantile*100}`:null,r.k!=null?`${r.k} neighbours`:null].filter(Boolean).join(' · ');
 }
 function renderFullCoefficients(index){
@@ -53,12 +53,12 @@ function prepareComparisons(){
    if(iv&&!['2SLS','OLS','TWFE'].includes(row.method)){diagnostics.push({...row,analysis:family.label});continue;}
    const identity=JSON.stringify([family.id==='main'?'main':family.id.split('/')[0],...['model','panel','specification','method','crime','quantile','k','N','beta'].map(k=>row[k]??null),timingOf(row)]);
    const interaction=String(row.method||'').startsWith('Crime ×')||row.interaction_beta!=null;
-   const candidate={...row,id:identity,_iv:iv,_family:row._group==='08_crime_original_robustness_outputs'?'Original crime · restricted years':family.id==='main'?'Main regressions':interaction?'Interaction regressions':iv?'IV and matched OLS/TWFE':row.quantile!=null?'Quantile regressions':'Spatial regressions',analysis:family.label};
+   const candidate={...row,id:identity,_iv:iv,_family:row._group==='08_crime_original_robustness_outputs'?'Original crime · restricted years':family.id==='main'?'Main regressions':family.id.startsWith('10_crime_mps_exposure_windows_outputs/')?'Crime exposure windows':interaction?'Interaction regressions':iv?'IV and matched OLS/TWFE':row.quantile!=null?'Quantile regressions':'Spatial regressions',analysis:family.label};
    const previous=unique.get(identity);
    if(!previous||Object.keys(row).length>Object.keys(previous).length-4)unique.set(identity,candidate);
   }
  }
- const order=['Main regressions','Original crime · restricted years','Interaction regressions','IV and matched OLS/TWFE','Quantile regressions','Spatial regressions'];
+ const order=['Main regressions','Crime exposure windows','Original crime · restricted years','Interaction regressions','IV and matched OLS/TWFE','Quantile regressions','Spatial regressions'];
  pool=[...unique.values()].sort((a,b)=>order.indexOf(a._family)-order.indexOf(b._family));
  renderShortcuts();
  const shared=decodeSharedSelection();
@@ -179,6 +179,25 @@ async function renderSpatialAppendix(){
  }
  $('spatial-appendix').hidden=false;
 }
+async function renderLongWindows(){
+ const group='10_crime_mps_exposure_windows_outputs';
+ const csv=catalog.files.find(f=>f.id===`${group}/m7_prior6_prior12_prior24_prior36_common_sample.csv`);
+ const figure=catalog.files.find(f=>f.id===`${group}/m7_prior6_prior12_prior24_prior36_common_sample.png`);
+ if(!csv||!figure)return;
+ const response=await fetch(url(csv.json));
+ if(!response.ok)throw Error(`HTTP ${response.status}`);
+ const data=await response.json();
+ const crimeOrder=['mps_all','mps_violence','mps_property'];
+ const windowOrder=['prior6','prior12','prior24','prior36'];
+ const rows=[...data.rows].sort((a,b)=>crimeOrder.indexOf(a.crime)-crimeOrder.indexOf(b.crime)||windowOrder.indexOf(a.exposure)-windowOrder.indexOf(b.exposure));
+ $('long-windows-table').innerHTML=table(
+  ['Crime','Exposure','Coefficient β','95% CI','p-value','β × partial crime SD','Sales'],
+  rows.map(r=>[esc(crimeLabel(r)),esc(timingLabel(r)),cell(r.beta,'beta'),
+    `${fmt(r.ci_low)} to ${fmt(r.ci_high)}`,fmt(r.p,'p'),fmt(r.beta_per_partial_crime_sd),fmt(r.N)]));
+ $('long-windows-download').href=url(csv.url);
+ $('long-windows-figure').innerHTML=`<button class="image-button" data-open="${esc(figure.id)}" aria-label="Enlarge ${esc(figure.title)}"><img src="${url(figure.url)}" alt="M7 coefficient estimates and 95% confidence intervals for 6, 12, 24 and 36 months of MPS crime"></button><a href="${url(figure.url)}" download>Download figure</a>`;
+ $('long-windows').hidden=false;
+}
 document.addEventListener('click',async e=>{
  const b=e.target.closest('button');if(!b)return;
  if(b.dataset.copyTable){
@@ -231,4 +250,4 @@ for(const id of ['image-dialog','table-dialog']){
 }
 $('table-dialog').addEventListener('close',()=>{request++;});
 $('row-search').oninput=()=>{page=0;renderTable();};$('sort').onchange=()=>{sortKey=$('sort').value;renderTable();};$('direction').onclick=()=>{ascending=!ascending;$('direction').textContent=ascending?'Ascending':'Descending';renderTable();};$('prev').onclick=()=>{page--;renderTable();};$('next').onclick=()=>{page++;renderTable();};
-fetch('generated/catalog.json').then(r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();}).then(data=>{catalog=data;$('group').innerHTML='<option value="">All notebooks</option>'+data.groups.map(g=>`<option value="${esc(g.id)}">${esc(g.label)}</option>`).join('');prepareComparisons();browse();renderSpatialAppendix().catch(e=>{$('spatial-appendix-table').textContent=`Could not load appendix table: ${e.message}`;$('spatial-appendix').hidden=false;});$('status').textContent=`Built ${new Date(data.built_at).toLocaleString()} · ${data.files.length} outputs. Build time is not notebook execution time.`;}).catch(e=>{$('status').textContent=`Could not load results: ${e.message}`;});
+fetch('generated/catalog.json').then(r=>{if(!r.ok)throw Error(`HTTP ${r.status}`);return r.json();}).then(data=>{catalog=data;$('group').innerHTML='<option value="">All notebooks</option>'+data.groups.map(g=>`<option value="${esc(g.id)}">${esc(g.label)}</option>`).join('');prepareComparisons();browse();renderLongWindows().catch(e=>{$('long-windows-table').textContent=`Could not load comparison: ${e.message}`;$('long-windows').hidden=false;});renderSpatialAppendix().catch(e=>{$('spatial-appendix-table').textContent=`Could not load appendix table: ${e.message}`;$('spatial-appendix').hidden=false;});$('status').textContent=`Built ${new Date(data.built_at).toLocaleString()} · ${data.files.length} outputs. Build time is not notebook execution time.`;}).catch(e=>{$('status').textContent=`Could not load results: ${e.message}`;});
